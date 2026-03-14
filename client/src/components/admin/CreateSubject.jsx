@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-export default function CreateSubject() {
+export default function CreateSubject({ onCreated }) {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     courseId: "",
@@ -44,6 +44,7 @@ export default function CreateSubject() {
       semester: "",
       type: "THEORY"
     });
+    if (onCreated) onCreated();
   };
 
   return (

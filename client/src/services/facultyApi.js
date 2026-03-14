@@ -21,7 +21,7 @@ export const getPendingHostelLeaves = async () => {
   return res.data;
 };
 
-export const approveHostelLeave = async (leaveId, status) => {
-  const res = await API.patch(`/hostel-leaves/${leaveId}`, { status });
+export const approveHostelLeave = async (leaveId, data) => {
+  const res = await API.patch(`/hostel-leaves/${leaveId}`, data);
   return res.data;
 };

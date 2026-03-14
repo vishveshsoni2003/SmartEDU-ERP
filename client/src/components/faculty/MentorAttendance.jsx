@@ -51,7 +51,7 @@ export default function MentorAttendance({ mentorDetails }) {
       courseId,
       year: mentorDetails.year,
       section: mentorDetails.section,
-      date: new Date().toISOString(),
+      date: new Date().toISOString().split('T')[0], // Send as YYYY-MM-DD
       session,
       presentStudents: present
     });

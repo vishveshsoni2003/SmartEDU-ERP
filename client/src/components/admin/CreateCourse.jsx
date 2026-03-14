@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../services/api";
 
-export default function CreateCourse() {
+export default function CreateCourse({ onCreated }) {
   const [form, setForm] = useState({
     name: "",
     durationYears: "",
@@ -18,6 +18,7 @@ export default function CreateCourse() {
 
       alert("Course created successfully");
       setForm({ name: "", durationYears: "", totalSemesters: "" });
+      if (onCreated) onCreated();
     } catch (err) {
       alert(err.response?.data?.message || "Error creating course");
     }

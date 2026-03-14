@@ -53,6 +53,12 @@ export const createHostel = async (data) => {
   return res.data;
 };
 
+// Delete hostel
+export const deleteHostel = async (hostelId) => {
+  const res = await API.delete(`/hostels/${hostelId}`);
+  return res.data;
+};
+
 // Allocate student to hostel
 export const allocateHostel = async (data) => {
   const res = await API.post("/hostels/allocate", data);
@@ -72,6 +78,12 @@ export const createBus = async (data) => {
   return res.data;
 };
 
+// Delete bus
+export const deleteBus = async (busId) => {
+  const res = await API.delete(`/transport/buses/${busId}`);
+  return res.data;
+};
+
 // Get all routes
 export const getAllRoutes = async () => {
   const res = await API.get("/transport/routes");
@@ -83,6 +95,13 @@ export const createRoute = async (data) => {
   const res = await API.post("/transport/routes", data);
   return res.data;
 };
+
+// Delete route
+export const deleteRoute = async (routeId) => {
+  const res = await API.delete(`/transport/routes/${routeId}`);
+  return res.data;
+};
+
 // Get institution admins
 export const getInstitutionAdmins = async () => {
   const res = await API.get("/admin/admins");

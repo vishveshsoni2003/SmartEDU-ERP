@@ -28,6 +28,10 @@ const hostelLeaveSchema = new mongoose.Schema(
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Faculty"
+    },
+    rejectionReason: {
+      type: String,
+      default: null
     }
   },
   { timestamps: true }

@@ -3,18 +3,222 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global base */
-body {
-  @apply bg-slate-100 text-slate-900 antialiased;
+/* ================================================================
+   SMARTEDU ERP - MODERN UI/UX SYSTEM
+   Global Styles & CSS Variables
+   ================================================================ */
+
+:root {
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
+    sans-serif;
+  --font-display: 'Poppins', system-ui, sans-serif;
+
+  /* Color Palette */
+  --color-primary: #3b82f6;
+  --color-primary-dark: #1f2937;
+  --color-primary-light: #eff6ff;
+
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #06b6d4;
+
+  /* Grays */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-400: #9ca3af;
+  --color-gray-600: #4b5563;
+  --color-gray-900: #111827;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
 }
-/* Ensure no inherited opacity */
+
+/* ================================================================
+   RESET & BASE STYLES
+   ================================================================ */
+
 * {
   opacity: 1 !important;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-gray-900 antialiased;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================================================================
+   TYPOGRAPHY
+   ================================================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  @apply font-bold leading-tight;
+}
+
+p {
+  @apply text-gray-600 leading-relaxed;
+}
+
+a {
+  @apply text-blue-500 no-underline transition-colors duration-200;
+}
+
+a:hover {
+  @apply text-blue-700;
+}
+
+/* ================================================================
+   FORM ELEMENTS
+   ================================================================ */
+
+input,
+textarea,
+select {
+  @apply transition-all duration-200;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-0;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  @apply bg-gray-100 text-gray-400 cursor-not-allowed;
+}
+
+label {
+  @apply block font-medium text-sm text-gray-700 mb-2;
+}
+
+/* ================================================================
+   LEGACY CLASSES (For backwards compatibility)
+   ================================================================ */
+
 .glass {
-  @apply bg-white border border-slate-100;
+  @apply bg-white border border-gray-200;
 }
 
 .card {
-  @apply bg-white rounded-2xl shadow-sm hover:shadow-md transition;
+  @apply bg-white rounded-lg shadow-sm hover:shadow-md transition;
+}
+
+/* ================================================================
+   UTILITIES
+   ================================================================ */
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-between {
+  @apply flex items-center justify-between;
+}
+
+.text-truncate {
+  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.sr-only {
+  @apply sr-only;
+}
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-in-out;
+}
+
+/* ================================================================
+   SCROLLBAR STYLING
+   ================================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* ================================================================
+   FOCUS VISIBLE (Accessibility)
+   ================================================================ */
+
+*:focus-visible {
+  @apply outline-2 outline-blue-500 outline-offset-2;
+}
+
+/* ================================================================
+   MEDIA QUERIES
+   ================================================================ */
+
+@media (max-width: 640px) {
+  h1 {
+    @apply text-3xl;
+  }
+
+  h2 {
+    @apply text-2xl;
+  }
 }

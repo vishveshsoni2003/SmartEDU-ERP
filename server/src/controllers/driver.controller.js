@@ -100,7 +100,8 @@ export const assignBusToDriver = async (req, res) => {
 };
 export const getDriverDashboard = async (req, res) => {
   try {
-    const driver = await Driver.findOne({
+    // First try to find as a Driver (legacy DRIVER role)
+    let driver = await Driver.findOne({
       userId: req.user.userId
     }).populate({
       path: "assignedBusId",
@@ -109,6 +110,38 @@ export const getDriverDashboard = async (req, res) => {
         model: "Route"
       }
     });
+
+    // If not found, try to find as TRANSPORT_MANAGER faculty
+    if (!driver && req.user.role === "FACULTY") {
+      // For TRANSPORT_MANAGER faculty, get bus directly from User's institution
+      const User = require("../models/User.js").default;
+      const user = await User.findById(req.user.userId);
+      
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found"
+        });
+      }
+
+      // Find any bus assigned to this transport manager's institution
+      // Or get the first bus in their institution
+      const Bus = require("../models/Bus.js").default;
+      const bus = await Bus.findOne({
+        institutionId: user.institutionId
+      }).populate({
+        path: "routeId",
+        model: "Route"
+      });
+
+      return res.json({
+        driver: {
+          name: user.name,
+          phone: user.email || "N/A",
+          licenseNumber: "TRANSPORT_MANAGER"
+        },
+        bus: bus || null
+      });
+    }
 
     if (!driver) {
       return res.status(404).json({

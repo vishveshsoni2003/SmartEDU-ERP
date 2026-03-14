@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-export default function CreateLecture() {
+export default function CreateLecture({ onCreated }) {
   const [form, setForm] = useState({
     courseId: "",
     subjectId: "",
@@ -27,6 +27,7 @@ export default function CreateLecture() {
   const submit = async () => {
     await api.post("/lectures", form);
     alert("Lecture created");
+    if (onCreated) onCreated();
   };
 
   return (

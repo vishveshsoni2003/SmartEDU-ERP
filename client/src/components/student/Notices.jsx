@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import gsap from "gsap";
 import { getStudentNotices } from "../../services/studentApi";
+import { Bell, Inbox } from "lucide-react";
 
 export default function Notices() {
   const [notices, setNotices] = useState([]);
@@ -16,32 +16,51 @@ export default function Notices() {
   }, []);
 
   if (loading) {
-    return <p className="text-slate-500">Loading notices...</p>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-pulse text-slate-500 flex items-center gap-2">
+          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+          Loading notices...
+        </div>
+      </div>
+    );
   }
 
   if (!notices.length) {
-    return <p className="text-slate-500">No notices available</p>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <Inbox className="w-16 h-16 text-slate-300 mb-4" />
+        <p className="text-slate-500 font-medium">No announcements yet</p>
+        <p className="text-slate-400 text-sm mt-1">Check back later for updates</p>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-4">Notices</h3>
-
-      <div className="space-y-4">
-        {notices.map((notice, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-xl border border-slate-200 p-4"
-          >
-            <h4 className="font-semibold text-slate-900">
-              {notice.title}
-            </h4>
-            <p className="text-sm text-slate-700 mt-1">
-              {notice.message}
-            </p>
+    <div className="space-y-3">
+      {notices.map((notice, i) => (
+        <div
+          key={i}
+          className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 p-4"
+        >
+          <div className="flex items-start gap-3">
+            <Bell className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-slate-900 text-sm break-words">
+                {notice.title}
+              </h4>
+              <p className="text-sm text-slate-700 mt-2 leading-relaxed">
+                {notice.message}
+              </p>
+              {notice.createdAt && (
+                <p className="text-xs text-slate-500 mt-2">
+                  {new Date(notice.createdAt).toLocaleDateString()}
+                </p>
+              )}
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

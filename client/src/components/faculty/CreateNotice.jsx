@@ -1,11 +1,11 @@
 import { useState } from "react";
 import api from "../../services/api";
 
-export default function CreateNotice({ isMentor }) {
+export default function CreateNotice({ onCreated }) {
   const [form, setForm] = useState({
     title: "",
     message: "",
-    targetAudience: "ALL"
+    targetAudience: "STUDENT"
   });
 
   const submit = async () => {
@@ -15,7 +15,8 @@ export default function CreateNotice({ isMentor }) {
 
     await api.post("/notices", form);
     alert("Notice created");
-    setForm({ title: "", message: "", targetAudience: "ALL" });
+    setForm({ title: "", message: "", targetAudience: "STUDENT" });
+    if (onCreated) onCreated();
   };
 
   return (
@@ -50,12 +51,10 @@ export default function CreateNotice({ isMentor }) {
           setForm({ ...form, targetAudience: e.target.value })
         }
       >
-        <option value="ALL">All</option>
+        {/* <option value="ALL">All</option> */}
         <option value="FACULTY">Faculty</option>
 
-        {isMentor && (
-          <option value="STUDENT">Students</option>
-        )}
+        <option value="STUDENT">Students</option>
       </select>
 
       <button

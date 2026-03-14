@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Institution from "../models/Institution.js";
+import Faculty from "../models/Faculty.js";
 
 /**
  * REGISTER
@@ -92,14 +93,25 @@ export const login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
+    // Build user response object
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      role: user.role,
+    };
+
+    // If FACULTY, fetch facultyType
+    if (user.role === "FACULTY") {
+      const faculty = await Faculty.findOne({ userId: user._id });
+      if (faculty) {
+        userResponse.facultyType = faculty.facultyType;
+      }
+    }
+
     return res.json({
       message: "Login successful",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        role: user.role,
-      },
+      user: userResponse,
     });
   } catch (error) {
     console.error("Login error:", error);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-export default function CreateSection() {
+export default function CreateSection({ onCreated }) {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     courseId: "",
@@ -16,6 +16,7 @@ export default function CreateSection() {
   const submit = async () => {
     await api.post("/sections", form);
     alert("Section created");
+    if (onCreated) onCreated();
   };
 
   return (

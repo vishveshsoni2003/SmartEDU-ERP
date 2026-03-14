@@ -135,3 +135,38 @@ export const getHostels = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+/**
+ * DELETE HOSTEL (ADMIN)
+ */
+export const deleteHostel = async (req, res) => {
+  try {
+    const { hostelId } = req.params;
+
+    const hostel = await Hostel.findOne({
+      _id: hostelId,
+      institutionId: req.user.institutionId
+    });
+
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // Check if any students are allocated to this hostel
+    const studentsInHostel = await Student.findOne({
+      hostelId: hostelId
+    });
+
+    if (studentsInHostel) {
+      return res.status(400).json({
+        message: "Cannot delete hostel with allocated students. Please deallocate all students first."
+      });
+    }
+
+    await Hostel.findByIdAndDelete(hostelId);
+
+    res.json({ message: "Hostel deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

@@ -27,7 +27,7 @@ export default function LectureAttendance({ lecture, onClose }) {
   const submit = async () => {
     const payload = {
       lectureId: lecture._id,
-      date: new Date(),
+      date: new Date().toISOString().split('T')[0], // Send as YYYY-MM-DD
       presentStudents: Array.from(present)
     };
 

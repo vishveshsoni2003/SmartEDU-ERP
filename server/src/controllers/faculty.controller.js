@@ -5,6 +5,7 @@ import Lecture from "../models/Lecture.js";
 import Mentor from "../models/Mentor.js";
 import Notice from "../models/Notice.js";
 import HostelLeave from "../models/HostelLeave.js";
+import Hostel from "../models/Hostel.js";
 // import Faculty from "../models/Faculty.js";
 /**
  * CREATE FACULTY (ADMIN)
@@ -142,10 +143,22 @@ export const getFacultyDashboard = async (req, res) => {
     ========================= */
     let pendingLeaves = 0;
     if (faculty.facultyType.includes("WARDEN")) {
-      pendingLeaves = await HostelLeave.countDocuments({
+      // Get hostels assigned to this warden
+      const hostels = await Hostel.find({
         institutionId: req.user.institutionId,
-        status: "PENDING",
+        wardenId: faculty._id
       });
+
+      const hostelIds = hostels.map(h => h._id);
+
+      // Count pending leaves only for this warden's hostels
+      if (hostelIds.length > 0) {
+        pendingLeaves = await HostelLeave.countDocuments({
+          institutionId: req.user.institutionId,
+          hostelId: { $in: hostelIds },
+          status: "PENDING"
+        });
+      }
     }
 
     /* =========================

@@ -16,7 +16,7 @@ export const createNotice = async (req, res) => {
 
     // FACULTY restriction
     if (req.user.role === "FACULTY") {
-      if (!["FACULTY", "STUDENT"].includes(targetAudience)) {
+      if (!["FACULTY", "STUDENT", "ALL"].includes(targetAudience)) {
         return res.status(403).json({
           message: "Faculty can only post for Faculty or Students"
         });
@@ -27,7 +27,7 @@ export const createNotice = async (req, res) => {
       institutionId: req.user.institutionId,
       title,
       message,
-      targetAudience,
+      targetAudience: [targetAudience], // Convert string to array for model
       postedBy: req.user.userId,
       expiresAt
     });
@@ -68,10 +68,10 @@ export const getMyNotices = async (req, res) => {
       };
     }
 
-    // 🔥 STUDENT sees ALL + STUDENTS
+    // 🔥 STUDENT sees ALL + STUDENT
     else if (req.user.role === "STUDENT") {
       filter.targetAudience = {
-        $in: ["ALL", "STUDENTS"]
+        $in: ["ALL", "STUDENT"]
       };
     }
 

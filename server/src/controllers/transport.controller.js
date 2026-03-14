@@ -61,16 +61,63 @@ export const createRoute = async (req, res) => {
  * ADMIN → CREATE BUS
  */
 export const createBus = async (req, res) => {
-  const { busNumber, routeId, capacity } = req.body;
+  try {
+    const { busNumber, routeId, capacity } = req.body;
 
-  const bus = await Bus.create({
-    institutionId: req.user.institutionId,
-    busNumber,
-    routeId,
-    capacity
-  });
+    // Validation
+    if (!busNumber || !routeId || !capacity) {
+      return res.status(400).json({
+        message: "Bus number, route, and capacity are required"
+      });
+    }
 
-  res.status(201).json({ busId: bus._id });
+    if (capacity < 1) {
+      return res.status(400).json({
+        message: "Capacity must be at least 1"
+      });
+    }
+
+    // Check if route exists
+    const route = await Route.findById(routeId);
+    if (!route) {
+      return res.status(404).json({
+        message: "Route not found"
+      });
+    }
+
+    // Check if route belongs to the institution
+    if (route.institutionId.toString() !== req.user.institutionId.toString()) {
+      return res.status(403).json({
+        message: "Unauthorized to use this route"
+      });
+    }
+
+    // Check for duplicate bus number
+    const existingBus = await Bus.findOne({
+      busNumber,
+      institutionId: req.user.institutionId
+    });
+    if (existingBus) {
+      return res.status(400).json({
+        message: "Bus with this number already exists"
+      });
+    }
+
+    const bus = await Bus.create({
+      institutionId: req.user.institutionId,
+      busNumber,
+      routeId,
+      capacity
+    });
+
+    res.status(201).json({
+      message: "Bus created successfully",
+      busId: bus._id,
+      bus
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 /**
@@ -132,5 +179,69 @@ export const getBuses = async (req, res) => {
     res.status(500).json({
       message: error.message
     });
+  }
+};
+
+/**
+ * ADMIN → DELETE ROUTE
+ */
+export const deleteRoute = async (req, res) => {
+  try {
+    const { routeId } = req.params;
+
+    // Find the route
+    const route = await Route.findById(routeId);
+
+    if (!route) {
+      return res.status(404).json({ message: "Route not found" });
+    }
+
+    // Check if route belongs to the institution
+    if (route.institutionId.toString() !== req.user.institutionId.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Check if route is assigned to any bus
+    const busWithRoute = await Bus.findOne({ routeId });
+    if (busWithRoute) {
+      return res.status(400).json({
+        message: "Cannot delete route that is assigned to a bus"
+      });
+    }
+
+    // Delete the route
+    await Route.findByIdAndDelete(routeId);
+
+    res.json({ message: "Route deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * ADMIN → DELETE BUS
+ */
+export const deleteBus = async (req, res) => {
+  try {
+    const { busId } = req.params;
+
+    // Find the bus
+    const bus = await Bus.findById(busId);
+
+    if (!bus) {
+      return res.status(404).json({ message: "Bus not found" });
+    }
+
+    // Check if bus belongs to the institution
+    if (bus.institutionId.toString() !== req.user.institutionId.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Delete the bus
+    await Bus.findByIdAndDelete(busId);
+
+    res.json({ message: "Bus deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

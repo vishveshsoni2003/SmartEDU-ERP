@@ -29,6 +29,7 @@ import mentorRoutes from "./src/routes/mentor.routes.js";
 import holidayRoutes from "./src/routes/holiday.routes.js";
 import facultyAttendanceRoutes from "./src/routes/facultyAttendance.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
+import applicationRoutes from "./src/routes/application.routes.js";
 
 // ================= MODELS =================
 import Bus from "./src/models/Bus.js";
@@ -66,6 +67,7 @@ app.use("/api/mentors", mentorRoutes);
 app.use("/api/holidays", holidayRoutes);
 app.use("/api/faculty-attendance", facultyAttendanceRoutes);
 app.use("/api/drivers", driverRoutes);
+app.use("/api/applications", applicationRoutes);
 
 // ================= SOCKET.IO =================
 const io = new Server(server, {
