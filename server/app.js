@@ -74,6 +74,58 @@ app.use("/api", apiLimiter);
 app.use("/api/auth/login", authLimiter);  // Extra strict only on login endpoint
 app.use(logAudit("API", "General API Request"));
 
+// ================= ROOT HEALTH PAGE =================
+app.get("/", (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendax API</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 40px 48px; max-width: 560px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
+    .badge { display: inline-flex; align-items: center; gap: 8px; background: #052e16; color: #4ade80; border: 1px solid #166534; border-radius: 999px; padding: 4px 14px; font-size: 13px; font-weight: 700; margin-bottom: 24px; }
+    .dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    h1 { font-size: 28px; font-weight: 800; color: #f8fafc; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .stat { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px 16px; }
+    .stat-label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.08em; }
+    .stat-value { font-size: 18px; font-weight: 800; color: #38bdf8; margin-top: 4px; }
+    .endpoints { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; }
+    .ep { font-size: 13px; color: #64748b; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+    .ep:last-child { border-bottom: none; }
+    .ep span { color: #7dd3fc; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge"><div class="dot"></div> All Systems Operational</div>
+    <h1>Attendax ERP API</h1>
+    <p>Production-grade multi-tenant ERP backend. All routes secured with JWT authentication and role-based access control.</p>
+    <div class="grid">
+      <div class="stat"><div class="stat-label">Port</div><div class="stat-value">${process.env.PORT || 5000}</div></div>
+      <div class="stat"><div class="stat-label">Environment</div><div class="stat-value">${process.env.NODE_ENV || 'development'}</div></div>
+      <div class="stat"><div class="stat-label">Version</div><div class="stat-value">1.0.0</div></div>
+      <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${Math.floor(process.uptime())}s</div></div>
+    </div>
+    <div class="endpoints">
+      <div class="ep"><span>POST</span> /api/auth/login</div>
+      <div class="ep"><span>GET</span>  /api/students</div>
+      <div class="ep"><span>GET</span>  /api/faculty</div>
+      <div class="ep"><span>GET</span>  /api/courses</div>
+      <div class="ep"><span>GET</span>  /api/notices</div>
+      <div class="ep"><span>GET</span>  /api/transport/routes</div>
+      <div class="ep"><span>POST</span> /api/bulk/:module</div>
+    </div>
+  </div>
+</body>
+</html>`);
+});
+
 // ================= REST ROUTES =================
 app.use("/api/auth", authRoutes);
 app.use("/api/institutions", institutionRoutes);
