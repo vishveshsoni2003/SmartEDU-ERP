@@ -21,6 +21,10 @@ const studentSchema = new mongoose.Schema(
     /* ==========================
        ACADEMIC IDENTITY
     ========================== */
+    profileImage: {
+      url: { type: String },
+      publicId: { type: String }
+    },
     enrollmentNo: {
       type: String,
       required: true,
@@ -45,7 +49,7 @@ const studentSchema = new mongoose.Schema(
 
     rollNo: {
       type: String,
-      required: true
+      required: true,
     },
 
     /* ==========================
@@ -122,5 +126,10 @@ studentSchema.index({
   year: 1,
   section: 1
 });
+
+studentSchema.index({ institutionId: 1, enrollmentNo: 1 }, { unique: true });
+studentSchema.index({ institutionId: 1, rollNo: 1 }, { unique: true });
+studentSchema.index({ institutionId: 1, hostelId: 1 });
+studentSchema.index({ institutionId: 1, busId: 1 });
 
 export default mongoose.model("Student", studentSchema);

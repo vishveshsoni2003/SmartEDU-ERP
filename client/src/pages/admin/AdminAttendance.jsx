@@ -1,101 +1,99 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Filter, Download } from 'lucide-react';
+import { BarChart3, Filter, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useAuth } from '../../context/AuthContext';
+import Card from '../../components/ui/Card';
 import api from '../../services/api';
 
 export default function AdminAttendance() {
-  const { user } = useAuth();
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterCourse, setFilterCourse] = useState('all');
 
   useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        setLoading(true);
-        // Fetch attendance data from API
-        const coursesRes = await api.get('/courses');
-        const attendanceData = coursesRes.data?.map(course => ({
+    api.get('/courses')
+      .then(res => {
+        const data = (res.data || []).map(course => ({
           course: course.name,
+          code: course.code,
           totalClasses: Math.floor(Math.random() * 50) + 20,
           avgAttendance: Math.floor(Math.random() * 40) + 50,
           lowAttendance: Math.floor(Math.random() * 10),
           excellent: Math.floor(Math.random() * 30) + 10
-        })) || [];
-        setAttendanceData(attendanceData);
-      } catch (err) {
-        console.error('Error fetching attendance:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAttendance();
+        }));
+        setAttendanceData(data);
+      })
+      .catch(() => setAttendanceData([]))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <DashboardLayout sidebar user={user}>
-      <div className="max-w-7xl">
+    <DashboardLayout>
+      <div className="space-y-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <BarChart3 size={32} className="text-blue-600" />
-              Attendance Reports
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+              <BarChart3 className="text-blue-600 h-9 w-9" /> Attendance Reports
             </h1>
-            <p className="text-gray-600 mt-2">Monitor and analyze attendance across all courses</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">Monitor attendance rates across all programs</p>
           </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
-            <Download size={20} />
-            Export Report
+          <button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20">
+            <Download size={18} /> Export Report
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-6">
-          <div className="flex items-center gap-4">
-            <Filter size={20} className="text-gray-600" />
-            <select 
-              value={filterCourse} 
-              onChange={(e) => setFilterCourse(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All Courses</option>
-              <option value="math">Mathematics</option>
-              <option value="physics">Physics</option>
-              <option value="chemistry">Chemistry</option>
-            </select>
-          </div>
+        {/* Stats Summary */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'Avg Attendance', value: '72%', color: 'blue' },
+            { label: 'Total Courses', value: attendanceData.length, color: 'indigo' },
+            { label: 'Low Attendance', value: attendanceData.reduce((a, c) => a + c.lowAttendance, 0), color: 'rose' },
+            { label: 'Excellent Rate', value: attendanceData.reduce((a, c) => a + c.excellent, 0), color: 'emerald' },
+          ].map((s, i) => (
+            <Card key={i} shadow="sm" padding="md">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{s.label}</p>
+              <p className={`text-3xl font-black mt-2 text-${s.color}-600 dark:text-${s.color}-400`}>{s.value}</p>
+            </Card>
+          ))}
         </div>
 
-        {/* Attendance Stats */}
+        {/* Course Cards */}
         {loading ? (
-          <div className="text-center py-8 text-gray-500">Loading attendance data...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-slate-100 dark:bg-slate-800 rounded-2xl" />)}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {attendanceData.map((stat, index) => (
-              <div key={index} className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{stat.course}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Average Attendance</p>
-                    <p className="text-2xl font-bold text-blue-600">{stat.avgAttendance}%</p>
+              <Card key={index} shadow="md" padding="lg">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{stat.course}</h3>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">{stat.code}</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Total Classes</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.totalClasses}</p>
-                  </div>
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Excellent (90%+)</p>
-                    <p className="text-2xl font-bold text-green-600">{stat.excellent}</p>
-                  </div>
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Low Attendance</p>
-                    <p className="text-2xl font-bold text-red-600">{stat.lowAttendance}</p>
+                  <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${stat.avgAttendance >= 75 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
+                    {stat.avgAttendance >= 75 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                    {stat.avgAttendance}% avg
                   </div>
                 </div>
-              </div>
+                {/* Bar */}
+                <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full mb-6 overflow-hidden">
+                  <div className={`h-full rounded-full ${stat.avgAttendance >= 75 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: `${stat.avgAttendance}%` }} />
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Classes</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{stat.totalClasses}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Excellent</p>
+                    <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{stat.excellent}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Low</p>
+                    <p className="text-xl font-black text-rose-600 dark:text-rose-400 mt-1">{stat.lowAttendance}</p>
+                  </div>
+                </div>
+              </Card>
             ))}
           </div>
         )}

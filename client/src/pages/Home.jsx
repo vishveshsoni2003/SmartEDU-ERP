@@ -1,226 +1,151 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Users, BookOpen, Zap } from 'lucide-react';
-import Navbar from '../components/layout/Navbar';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ArrowRight, Sparkles, Layout, Zap, Lock, Blocks, ShieldCheck } from "lucide-react";
+import Navbar from "../components/layout/Navbar";
 
-/**
- * Modern Home/Landing Page
- * Features:
- * - Clean hero section
- * - Feature highlights
- * - Call-to-action buttons
- * - Responsive design
- */
 export default function Home() {
-  const features = [
+  const architectures = [
     {
-      icon: Users,
-      title: 'Multi-Role Management',
-      description: 'Manage students, faculty, admin, and driver roles with custom dashboards.',
+      icon: <Blocks className="w-5 h-5 text-indigo-500" />,
+      title: "Modular Deployment",
+      description: "Scale independent routing contexts separating Student, Faculty, and Transport telemetry nodes fluidly."
     },
     {
-      icon: BookOpen,
-      title: 'Course Management',
-      description: 'Organize courses, sections, and timetables efficiently in one place.',
+      icon: <Zap className="w-5 h-5 text-blue-500" />,
+      title: "Instant Sync",
+      description: "WebSocket interfaces maintain real-time bidirectional states resolving massive concurrent matrices instantly."
     },
     {
-      icon: Zap,
-      title: 'Real-time Tracking',
-      description: 'Monitor attendance, transportation, and hostel activities in real-time.',
-    },
-  ];
-
-  const stats = [
-    { label: 'Students', value: '5000+' },
-    { label: 'Institutions', value: '50+' },
-    { label: 'Active Courses', value: '1000+' },
+      icon: <Lock className="w-5 h-5 text-purple-500" />,
+      title: "Tenant Isolation",
+      description: "Every deployment bound locally guaranteeing maximum memory containment across multi-tenant bounds flawlessly."
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#030712] font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-32 overflow-hidden">
-        {/* Background gradient effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 -z-10" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-20 -z-10" />
+      {/* HERO SECTION - Linear / Vercel Aesthetic */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-40 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center overflow-hidden">
 
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-6 border border-blue-200">
-            <span className="w-2 h-2 bg-blue-500 rounded-full" />
-            <span className="text-sm font-medium text-blue-700">
-              Welcome to SmartEdu ERP
+        {/* Background Lights Grid */}
+        <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/dvzbsdjoe/image/upload/v1/grid-pattern')] opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
+        <div className="absolute top-1/3 left-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] opacity-40 dark:opacity-20 pointer-events-none blur-[120px] bg-gradient-to-b from-blue-500 to-indigo-600 rounded-[100%]"></div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-10"
+        >
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <span className="px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold text-xs tracking-wider uppercase border border-blue-200 dark:border-blue-900/50 shadow-sm flex items-center gap-2">
+              <Sparkles size={14} /> System 2.0 Operational
             </span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Comprehensive Academic <br />
-            <span className="bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
-              Management System
-            </span>
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 dark:text-white mb-8 max-w-5xl mx-auto leading-[0.95]">
+            Architecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 dark:from-blue-400 dark:to-indigo-400">Institutional</span> Logic.
           </h1>
 
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Manage your institution with ease. From attendance tracking to transportation, 
-            all in one unified platform.
+          <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-12 font-medium">
+            Attendax maps comprehensive identity infrastructures integrating students, faculties, transport structures, and high-speed telemetry entirely.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link to="/login">
-              <Button size="lg" variant="solid" color="primary" icon={ArrowRight}>
-                Student / Faculty / Admin Login
-              </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/login" className="w-full sm:w-auto px-8 py-4 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-2xl transition-all shadow-xl shadow-slate-900/20 dark:shadow-white/10 flex items-center justify-center gap-2 hover:scale-[1.02]">
+              Initialize Portal <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link to="/super-admin/login">
-              <Button size="lg" variant="outline" color="primary">
-                Super Admin Login
-              </Button>
+            <Link to="/super-admin/login" className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-[#030712] text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all flex items-center justify-center gap-2">
+              <ShieldCheck className="w-5 h-5" /> Root Access
             </Link>
           </div>
+        </motion.div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                  {stat.value}
-                </p>
-                <p className="text-sm text-gray-600">{stat.label}</p>
+        {/* Dashboard Frame Mockup */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+          className="mt-24 w-full max-w-6xl relative z-10"
+        >
+          <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-2xl shadow-indigo-100/50 dark:shadow-indigo-900/20 bg-white/50 dark:bg-[#0f172a]/50 backdrop-blur-xl overflow-hidden relative">
+
+            {/* Mock Header */}
+            <div className="bg-slate-50/80 dark:bg-slate-900/80 border-b border-slate-200/50 dark:border-slate-800/50 px-4 py-3 flex items-center gap-4">
+              <div className="flex gap-2">
+                <div className="h-3 w-3 rounded-full bg-rose-400 dark:bg-rose-500/50"></div>
+                <div className="h-3 w-3 rounded-full bg-amber-400 dark:bg-amber-500/50"></div>
+                <div className="h-3 w-3 rounded-full bg-emerald-400 dark:bg-emerald-500/50"></div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <div className="flex-1 max-w-sm ml-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 px-4 text-xs font-mono text-slate-400 dark:text-slate-500 flex items-center justify-center shadow-inner">
+                attendax.edu/gateway
+              </div>
+            </div>
 
-      {/* Features Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Powerful Features
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Everything you need to manage your educational institution effectively
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature) => (
-              <Card key={feature.title} hoverable shadow="sm" padding="lg">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-4">
-                  <feature.icon size={24} />
+            {/* Mock Grids */}
+            <div className="flex h-[400px] p-6 gap-6">
+              <div className="w-64 space-y-4 hidden md:block">
+                <div className="h-8 w-2/3 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse mb-8"></div>
+                {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-4 bg-slate-100 dark:bg-slate-800/50 rounded-md animate-pulse"></div>)}
+              </div>
+              <div className="flex-1 flex flex-col gap-6">
+                <div className="flex justify-between items-center bg-transparent">
+                  <div className="h-10 w-1/3 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse"></div>
+                  <div className="h-10 w-32 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl animate-pulse"></div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </Card>
-            ))}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800/50"></div>)}
+                </div>
+                <div className="flex-1 bg-slate-50 dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] dark:bg-[size:2rem_2rem] rounded-2xl border border-slate-100 dark:border-slate-800/50"></div>
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* User Roles Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-20">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Built for Everyone
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Tailored dashboards and features for each user role
-            </p>
-          </div>
-
-          {/* Roles Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: 'Students', features: ['View Timetable', 'Mark Attendance', 'Track Grades'] },
-              { title: 'Faculty', features: ['Manage Classes', 'Record Attendance', 'Update Grades'] },
-              { title: 'Admin', features: ['User Management', 'Reports', 'System Settings'] },
-              { title: 'Drivers', features: ['Route Tracking', 'GPS Tracking', 'Schedule View'] },
-            ].map((role) => (
-              <Card key={role.title} padding="md" shadow="sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  {role.title}
-                </h3>
-                <ul className="space-y-2">
-                  {role.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer CTA */}
-      <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-r from-blue-500 to-blue-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Ready to Transform Your Institution?
-          </h2>
-          <p className="text-lg mb-8 opacity-90">
-            Get started with SmartEdu ERP today
+      {/* CORE SPECIFICATIONS */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100 dark:border-slate-800/50 relative z-10">
+        <div className="mb-16">
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-4">Underlying Architecture</h2>
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-lg max-w-2xl">
+            Engineered strictly resolving scalable multi-tier role deployments mapping rigid variables into flexible user experiences automatically.
           </p>
-          <Link to="/login">
-            <Button size="lg" variant="solid" color="primary">
-              Get Started Now
-            </Button>
-          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          {architectures.map((item, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1, duration: 0.5 }}
+              className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-colors group relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/5 rounded-bl-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500"></div>
+              <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center mb-6 relative z-10 shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+                {item.icon}
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">{item.title}</h3>
+              <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed relative z-10 text-sm">
+                {item.description}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 px-4 sm:px-6 lg:px-8 py-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="text-white font-bold mb-4">SmartEdu</h4>
-              <p className="text-sm">Comprehensive educational management platform.</p>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Product</h4>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-white transition">Features</a></li>
-                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Company</h4>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-white transition">About</a></li>
-                <li><a href="#" className="hover:text-white transition">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Legal</h4>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-white transition">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition">Terms</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2026 SmartEdu ERP. All rights reserved.</p>
-          </div>
+      {/* FOOTER */}
+      <footer className="border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-[#030712] py-12 text-center relative z-10">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Layout className="w-5 h-5 text-blue-600 dark:text-blue-500" />
+          <span className="font-bold text-slate-900 dark:text-white tracking-tight text-lg">Attendax</span>
         </div>
+        <p className="text-slate-400 dark:text-slate-500 font-semibold text-sm">
+          &copy; {new Date().getFullYear()} Attendax Networks. Immutable bounds.
+        </p>
       </footer>
     </div>
   );

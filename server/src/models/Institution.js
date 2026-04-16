@@ -15,6 +15,14 @@ const institutionSchema = new mongoose.Schema(
       type: String,
       enum: ["ACTIVE", "INACTIVE"],
       default: "ACTIVE"
+    },
+    logo: {
+      url: { type: String },
+      publicId: { type: String }
+    },
+    banner: {
+      url: { type: String },
+      publicId: { type: String }
     }
   },
   { timestamps: true }

@@ -9,6 +9,10 @@ const noticeSchema = new mongoose.Schema(
     },
     title: { type: String, required: true },
     message: { type: String, required: true },
+    attachment: {
+      url: { type: String },
+      publicId: { type: String }
+    },
     targetAudience: {
       type: [String],
       enum: [
@@ -21,6 +25,10 @@ const noticeSchema = new mongoose.Schema(
       ],
       default: ["ALL"]
     },
+    targetHostelId: { type: mongoose.Schema.Types.ObjectId, ref: "Hostel" },
+    targetBusId: { type: mongoose.Schema.Types.ObjectId, ref: "Bus" },
+    targetClubId: { type: mongoose.Schema.Types.ObjectId, ref: "Club" },
+    isArchived: { type: Boolean, default: false },
     postedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -30,5 +38,8 @@ const noticeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+noticeSchema.index({ institutionId: 1, isArchived: 1, createdAt: -1 });
+noticeSchema.index({ institutionId: 1, "targetAudience": 1 });
 
 export default mongoose.model("Notice", noticeSchema);

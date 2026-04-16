@@ -24,6 +24,24 @@ export const createSubject = async (req, res) => {
 export const createLecture = async (req, res) => {
   const { subjectId, facultyId, day, startTime, endTime, room } = req.body;
 
+  // Collision Detection Engine
+  const conflict = await Lecture.findOne({
+    institutionId: req.user.institutionId,
+    day: day,
+    $or: [
+      { facultyId },
+      { room }
+    ],
+    $and: [
+      { startTime: { $lt: endTime } },
+      { endTime: { $gt: startTime } }
+    ]
+  });
+
+  if (conflict) {
+    return res.status(409).json({ message: "Collision Failure: Target Faculty or Room overlapping actively within this exact matrix timeframe." });
+  }
+
   const lecture = await Lecture.create({
     institutionId: req.user.institutionId,
     subjectId,

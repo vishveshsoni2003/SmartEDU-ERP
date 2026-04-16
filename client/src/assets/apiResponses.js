@@ -1,6 +1,6 @@
 /**
- * SmartEdu ERP
- * Centralized mock API responses for frontend development
+ * Attendax ERP
+ * Mock API Responses for Frontend Testingvelopment
  * Replace these with real API calls later
  */
 
@@ -24,9 +24,9 @@ export const institutionResponse = {
   createInstitution: {
     message: "Institution created successfully",
     institution: {
-      _id: "INSTITUTION_ID",
-      name: "SmartEdu College",
-      code: "SMART001"
+      id: "ORG-001",
+      name: "Attendax University",
+      domain: "attendax.edu",
     }
   }
 };

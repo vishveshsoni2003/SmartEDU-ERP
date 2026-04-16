@@ -14,7 +14,10 @@ const userSchema = new mongoose.Schema(
       enum: ["SUPER_ADMIN", "ADMIN", "SUB_ADMIN", "FACULTY", "STUDENT", "DRIVER"],
       required: true
     },
-    status: { type: String, default: "ACTIVE" }
+    status: { type: String, default: "ACTIVE" },
+    refreshToken: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpire: { type: Date }
   },
   { timestamps: true }
 );

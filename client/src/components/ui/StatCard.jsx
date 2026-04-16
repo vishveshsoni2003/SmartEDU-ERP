@@ -1,100 +1,64 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
-/**
- * Stat Card Component - Display key metrics/KPIs
- * Modern, clean design with icon and trend indicator
- */
 export default function StatCard({
   title,
   value,
   icon: Icon = null,
   trend = null,
-  trendDirection = 'up', // 'up' or 'down'
-  trendColor = 'green',
+  trendDirection = 'up',
   description,
   onClick = null,
   className = '',
+  delay = 0
 }) {
-  const isTrendPositive = trendDirection === 'up';
-  const trendColorClass = isTrendPositive ? 'text-green-600' : 'text-red-600';
-  const trendBgClass = isTrendPositive ? 'bg-green-50' : 'bg-red-50';
+  const isPositive = trendDirection === 'up';
 
-  // Dynamic icon background colors
-  const getIconBgColor = () => {
-    if (!Icon) return 'bg-slate-100 text-slate-600';
-    const colors = [
-      'bg-blue-100 text-blue-600',
-      'bg-purple-100 text-purple-600',
-      'bg-green-100 text-green-600',
-      'bg-orange-100 text-orange-600',
-      'bg-pink-100 text-pink-600',
-      'bg-indigo-100 text-indigo-600',
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
+  // Aesthetic color variations
+  const themes = [
+    { bg: 'bg-blue-500/10 dark:bg-blue-400/10', icon: 'text-blue-600 dark:text-blue-400' },
+    { bg: 'bg-emerald-500/10 dark:bg-emerald-400/10', icon: 'text-emerald-600 dark:text-emerald-400' },
+    { bg: 'bg-purple-500/10 dark:bg-purple-400/10', icon: 'text-purple-600 dark:text-purple-400' },
+    { bg: 'bg-amber-500/10 dark:bg-amber-400/10', icon: 'text-amber-600 dark:text-amber-400' }
+  ];
+  const theme = Icon ? themes[title.length % themes.length] : themes[0];
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay }}
+      whileHover={onClick ? { y: -4, transition: { duration: 0.2 } } : {}}
+      onClick={onClick}
       className={`
-        bg-white rounded-xl border border-slate-200
-        p-6 transition-all duration-300 shadow-sm
-        ${onClick ? 'hover:shadow-lg hover:border-slate-300 cursor-pointer' : ''}
+        relative overflow-hidden bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800/80
+        p-6 backdrop-blur-xl transition-all duration-300 shadow-sm shadow-slate-200/50 dark:shadow-none
+        ${onClick ? 'cursor-pointer hover:shadow-xl hover:shadow-slate-200/60 hover:dark:shadow-indigo-900/20 hover:border-blue-300 dark:hover:border-slate-700' : ''}
         ${className}
       `}
-      onClick={onClick}
     >
-      {/* Header with Icon and Title */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide">{title}</p>
-        </div>
+      <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full opacity-20 pointer-events-none blur-2xl" style={{ backgroundColor: 'var(--tw-colors-blue-500)' }} />
 
+      <div className="flex items-start justify-between mb-4 relative z-10">
+        <p className="text-xs font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase">{title}</p>
         {Icon && (
-          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconBgColor()}`}>
-            <Icon size={24} />
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${theme.bg}`}>
+            <Icon size={24} className={theme.icon} />
           </div>
         )}
       </div>
 
-      {/* Value */}
-      <h3 className="text-4xl font-bold text-slate-900 mb-3">{value}</h3>
+      <h3 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2 relative z-10 tracking-tight">{value}</h3>
 
-      {/* Description + Trend */}
-      <div className="flex items-center justify-between gap-2">
-        {description && (
-          <p className="text-xs text-slate-500 font-medium">{description}</p>
-        )}
-
+      <div className="flex items-center justify-between gap-3 mt-4 relative z-10">
         {trend && (
-          <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full ${trendBgClass} flex-shrink-0`}>
-            <svg
-              className={`w-4 h-4 ${trendColorClass}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isTrendPositive ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M7 16V4m0 0L3 8m4-4l4 4"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M17 8v12m0 0l4-4m-4 4l-4-4"
-                />
-              )}
-            </svg>
-            <span className={`text-xs font-bold ${trendColorClass}`}>
-              {trend}
-            </span>
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${isPositive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'}`}>
+            {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />} {trend}
           </div>
         )}
+        {description && <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">{description}</p>}
       </div>
-    </div>
+    </motion.div>
   );
 }

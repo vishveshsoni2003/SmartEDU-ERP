@@ -1,69 +1,55 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
-/**
- * Card Component - Clean, minimal container with elevation
- * Used for content grouping, product cards, stat displays
- */
 export default function Card({
   children,
   className = '',
   hoverable = false,
   borderless = false,
-  shadow = 'sm',
-  padding = 'md',
+  shadow = 'md',
+  padding = 'lg',
+  delay = 0,
   ...props
 }) {
-  const shadowClasses = {
+  const shadowMap = {
     none: 'shadow-none',
-    sm: 'shadow-sm',
-    md: 'shadow-md',
-    lg: 'shadow-lg',
+    sm: 'shadow-[0_1px_3px_rgba(0,0,0,0.02)]',
+    md: 'shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)]',
+    lg: 'shadow-[0_10px_30px_-5px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)]',
   };
 
-  const paddingClasses = {
-    xs: 'p-3',
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
+  const padMap = {
     none: 'p-0',
+    sm: 'p-4 sm:p-5',
+    md: 'p-6 sm:p-8',
+    lg: 'p-8 sm:p-10',
   };
 
-  const hoverClasses = hoverable
-    ? 'transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer'
+  const hoverFx = hoverable
+    ? 'hover:scale-[1.01] hover:shadow-xl transition-all duration-300 cursor-pointer border-transparent hover:border-blue-200 dark:hover:border-slate-700'
     : '';
 
-  const borderClass = borderless ? '' : 'border border-gray-200';
+  const borderFx = borderless
+    ? 'border-none'
+    : 'border border-slate-200/80 dark:border-slate-800/80';
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay }}
       className={`
-        bg-white rounded-lg
-        ${borderClass}
-        ${paddingClasses[padding]}
-        ${shadowClasses[shadow]}
-        ${hoverClasses}
+        bg-white dark:bg-slate-900 rounded-3xl
+        ${borderFx}
+        ${padMap[padding]}
+        ${shadowMap[shadow]}
+        ${hoverFx}
         ${className}
       `}
       {...props}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
-
-/**
- * Usage Examples:
- * 
- * <Card>
- *   <h3 className="text-lg font-semibold">Basic Card</h3>
- *   <p className="text-gray-600 mt-2">Card content here</p>
- * </Card>
- * 
- * <Card hoverable shadow="md" padding="lg">
- *   Hoverable card with large padding
- * </Card>
- * 
- * <Card padding="none" borderless>
- *   Custom content without padding
- * </Card>
- */

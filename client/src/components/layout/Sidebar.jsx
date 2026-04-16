@@ -1,29 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Bus,
-  DollarSign,
-  Settings,
-  LogOut,
-  Menu,
-  X,
+  LayoutDashboard, Users, Calendar, Bus, DollarSign,
+  Settings, LogOut, Menu, X, CheckSquare, BarChart3, Database, Frame
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-/**
- * Modern Sidebar Component
- * Features:
- * - Collapsible on mobile
- * - Active link highlighting
- * - Icon + text navigation
- */
 export default function Sidebar({ user, onLogout }) {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Define navigation items based on user role
   const getNavItems = () => {
     const baseItems = [
       { label: 'Dashboard', href: '/student', icon: LayoutDashboard },
@@ -33,10 +19,10 @@ export default function Sidebar({ user, onLogout }) {
     if (user?.role === 'ADMIN') {
       return [
         { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-        { label: 'Users', href: '/admin/users', icon: Users },
-        { label: 'Courses', href: '/admin/courses', icon: Calendar },
-        { label: 'Attendance', href: '/admin/attendance', icon: Calendar },
-        { label: 'Reports', href: '/admin/reports', icon: DollarSign },
+        { label: 'Users & Admissions', href: '/admin/users', icon: Users },
+        { label: 'Academic Rigor', href: '/admin/courses', icon: Database },
+        { label: 'Global Attendance', href: '/admin/attendance', icon: CheckSquare },
+        { label: 'Telemetry & Finance', href: '/admin/reports', icon: BarChart3 },
       ];
     }
 
@@ -44,16 +30,16 @@ export default function Sidebar({ user, onLogout }) {
       return [
         { label: 'Dashboard', href: '/faculty', icon: LayoutDashboard },
         { label: 'My Classes', href: '/faculty/classes', icon: Users },
-        { label: 'Attendance', href: '/faculty/attendance', icon: Calendar },
-        { label: 'Grades', href: '/faculty/grades', icon: DollarSign },
+        { label: 'Attendance Matrix', href: '/faculty/attendance', icon: CheckSquare },
+        { label: 'Grade Distributions', href: '/faculty/grades', icon: BarChart3 },
       ];
     }
 
     if (user?.role === 'DRIVER') {
       return [
         { label: 'Dashboard', href: '/driver', icon: LayoutDashboard },
-        { label: 'Routes', href: '/driver/routes', icon: Bus },
-        { label: 'History', href: '/driver/history', icon: Calendar },
+        { label: 'Active Routes', href: '/driver/routes', icon: Bus },
+        { label: 'Log Histories', href: '/driver/history', icon: Calendar },
       ];
     }
 
@@ -61,93 +47,109 @@ export default function Sidebar({ user, onLogout }) {
   };
 
   const navItems = getNavItems();
-
   const isActive = (href) => location.pathname === href;
 
   return (
     <>
-      {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-20 left-4 z-40 p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-lg"
       >
-        {isOpen ? <X size={20} /> : <Menu size={20} />}
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Sidebar */}
       <aside
         className={`
-          fixed lg:relative left-0 top-16 lg:top-0 h-screen lg:h-auto
-          w-64 bg-white border-r border-gray-200
+          fixed lg:relative left-0 top-0 h-screen
+          w-72 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/60
           transform transition-transform duration-300 ease-in-out
-          z-30 lg:z-0
-          overflow-y-auto
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          z-40 lg:z-0 lg:translate-x-0 overflow-y-auto flex flex-col shadow-2xl lg:shadow-none
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        {/* Logo on Mobile */}
-        <div className="lg:hidden h-16 flex items-center px-6 border-b border-gray-200">
-          <h2 className="text-lg font-bold text-gray-900">Menu</h2>
+        {/* Header App Logo Brand */}
+        <div className="h-20 flex items-center px-8 border-b border-slate-100 dark:border-slate-800/80">
+          <Link to="/" className="flex items-center gap-3 w-full group">
+            <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 rounded-xl group-hover:scale-105 transition-transform">
+              <Frame className="h-6 w-6 text-white" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Attendax</h2>
+          </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="px-4 py-6 space-y-2 lg:py-8 lg:px-6">
-          {navItems.map((item) => (
-            <div key={item.href}>
+        {/* User Context */}
+        <div className="px-6 py-8">
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-200/60 dark:border-slate-800/60 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-inner shadow-black/20">
+              {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user?.name || "Institution User"}</p>
+              <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5 truncate uppercase tracking-widest">{user?.role || "GUEST"}</p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="px-4 flex-1 space-y-1.5 pb-8">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
               <Link
+                key={item.href}
                 to={item.href}
                 onClick={() => setIsOpen(false)}
                 className={`
-                  flex items-center gap-3 px-4 py-2.5 rounded-lg
-                  transition-all duration-200 font-medium text-sm
-                  ${
-                    isActive(item.href)
-                      ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-500'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  relative flex items-center gap-3.5 px-4 py-3 rounded-xl
+                  transition-all duration-200 font-bold text-sm overflow-hidden group
+                  ${active
+                    ? 'text-blue-700 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20 shadow-[0_2px_10px_-4px_rgba(59,130,246,0.3)]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/40'
                   }
                 `}
               >
-                <item.icon size={20} />
+                {active && (
+                  <motion.div layoutId="sidebar-active" className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500 rounded-r-md"></motion.div>
+                )}
+                <item.icon size={20} className={active ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors'} />
                 <span>{item.label}</span>
               </Link>
-            </div>
-          ))}
+            )
+          })}
         </nav>
 
-        {/* Divider */}
-        <div className="border-t border-gray-200 my-4" />
-
-        {/* Settings & Logout */}
-        <nav className="px-4 py-4 lg:px-6 space-y-2">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800/80">
           <Link
             to="/settings"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition font-medium text-sm"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:hover:text-white transition font-bold text-sm mb-1"
           >
-            <Settings size={20} />
-            <span>Settings</span>
+            <Settings size={20} className="text-slate-400 dark:text-slate-500" />
+            <span>Node Parameters</span>
           </Link>
-
           <button
             onClick={() => {
               onLogout?.();
               setIsOpen(false);
             }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition font-medium text-sm"
+            className="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition font-bold text-sm"
           >
-            <LogOut size={20} />
-            <span>Logout</span>
+            <LogOut size={20} className="text-rose-500 dark:text-rose-400" />
+            <span>Terminate Subnet</span>
           </button>
-        </nav>
+        </div>
       </aside>
 
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 lg:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

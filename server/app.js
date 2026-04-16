@@ -2,10 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
-import { Server } from "socket.io";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 // ================= CONFIG =================
 import connectDB from "./src/config/db.js";
+import { initSocket } from "./src/utils/socket.js";
 
 // ================= ROUTES =================
 import authRoutes from "./src/routes/auth.routes.js";
@@ -16,6 +18,7 @@ import hostelRoutes from "./src/routes/hostel.routes.js";
 import hostelLeaveRoutes from "./src/routes/hostelLeave.routes.js";
 import noticeRoutes from "./src/routes/notice.routes.js";
 import clubRoutes from "./src/routes/club.routes.js";
+import bulkRoutes from "./src/routes/bulk.routes.js";
 import transportRoutes from "./src/routes/transport.routes.js";
 import timetableRoutes from "./src/routes/timetable.routes.js";
 import attendanceRoutes from "./src/routes/attendance.routes.js";
@@ -30,9 +33,8 @@ import holidayRoutes from "./src/routes/holiday.routes.js";
 import facultyAttendanceRoutes from "./src/routes/facultyAttendance.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
 import applicationRoutes from "./src/routes/application.routes.js";
-
-// ================= MODELS =================
-import Bus from "./src/models/Bus.js";
+import reportRoutes from "./src/routes/report.routes.js";
+import { logAudit } from "./src/middlewares/audit.middleware.js";
 
 // ================= INIT =================
 dotenv.config();
@@ -41,9 +43,36 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// ================= MIDDLEWARE =================
+// ================= SECURITY & MIDDLEWARE =================
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+const isDev = process.env.NODE_ENV !== "production";
+
+// General API limiter — relaxed to 500 req/15min; skipped entirely in dev
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 0 : 500,          // 0 = unlimited in development
+  skip: () => isDev,             // Hard skip in dev mode
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please try again after 15 minutes." }
+});
+
+// Auth limiter — only applies in production (10 login attempts per 15 min)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 0 : 10,
+  skip: () => isDev,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts. Please wait 15 minutes." }
+});
+
+app.use("/api", apiLimiter);
+app.use("/api/auth/login", authLimiter);  // Extra strict only on login endpoint
+app.use(logAudit("API", "General API Request"));
 
 // ================= REST ROUTES =================
 app.use("/api/auth", authRoutes);
@@ -54,6 +83,7 @@ app.use("/api/hostels", hostelRoutes);
 app.use("/api/hostel-leaves", hostelLeaveRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/clubs", clubRoutes);
+app.use("/api/bulk", bulkRoutes);
 app.use("/api/transport", transportRoutes);
 app.use("/api/timetable", timetableRoutes);
 app.use("/api/attendance", attendanceRoutes);
@@ -68,59 +98,17 @@ app.use("/api/holidays", holidayRoutes);
 app.use("/api/faculty-attendance", facultyAttendanceRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/reports", reportRoutes);
 
 // ================= SOCKET.IO =================
-const io = new Server(server, {
-  cors: {
-    origin: "*"
-  }
-});
+initSocket(server);
 
-io.on("connection", (socket) => {
-  console.log("🟢 Socket connected:", socket.id);
-
-  /**
-   * STUDENT / ADMIN / FACULTY joins a bus room
-   */
-  socket.on("joinBus", (busId) => {
-    if (!busId) return;
-    socket.join(`bus_${busId}`);
-    console.log(`Socket ${socket.id} joined bus_${busId}`);
-  });
-
-  /**
-   * DRIVER sends live location
-   */
-  socket.on("bus:location", async ({ busId, lat, lng }) => {
-    if (!busId || lat == null || lng == null) {
-      return;
-    }
-
-    try {
-      const bus = await Bus.findById(busId);
-      if (!bus) return;
-
-      bus.currentLocation = {
-        lat,
-        lng,
-        updatedAt: new Date()
-      };
-      await bus.save();
-
-      // Broadcast only to viewers of this bus
-      io.to(`bus_${busId}`).emit("bus:location:update", {
-        lat,
-        lng,
-        updatedAt: bus.currentLocation.updatedAt
-      });
-
-    } catch (error) {
-      console.error("🚨 Bus location error:", error.message);
-    }
-  });
-
-  socket.on("disconnect", () => {
-    console.log("🔴 Socket disconnected:", socket.id);
+// ================= ERROR HANDLING =================
+app.use((err, req, res, next) => {
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
 });
 
@@ -128,5 +116,5 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`🚀 SmartEdu ERP Server running on port ${PORT}`);
+  console.log(`🚀 Attendax ERP Server running on port ${PORT}`);
 });

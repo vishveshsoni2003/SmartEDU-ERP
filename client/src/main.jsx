@@ -4,6 +4,7 @@ import App from "./App";
 import "./index.css";
 
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { Toaster } from "react-hot-toast";
 import { LoadScript } from "@react-google-maps/api";
 
@@ -13,11 +14,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     libraries={["places"]}
   >
 
-  <React.StrictMode>
-    <AuthProvider>
-      <Toaster position="top-right" />
-      <App />
-    </AuthProvider>
-  </React.StrictMode>
+    <React.StrictMode>
+      <ThemeProvider>
+        <AuthProvider>
+          <Toaster position="top-right" />
+          <App />
+        </AuthProvider>
+      </ThemeProvider>
+    </React.StrictMode>
   </LoadScript>
 );

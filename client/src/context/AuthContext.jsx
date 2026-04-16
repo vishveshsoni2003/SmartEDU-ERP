@@ -3,19 +3,30 @@ import { createContext, useContext, useState } from "react";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
-  );
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      return stored && stored !== "undefined" ? JSON.parse(stored) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
+  });
 
-  const login = (userData, token) => {
+  const login = (userData, accessToken, refreshToken) => {
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", token);
+    localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
     setUser(userData);
   };
 
   const logout = () => {
     localStorage.clear();
     setUser(null);
+    // Hard reload cleanly resets the entire app state & UI memory cache
+    window.location.href = "/login";
   };
 
   return (

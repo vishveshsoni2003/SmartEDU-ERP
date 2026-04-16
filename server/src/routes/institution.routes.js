@@ -3,9 +3,12 @@ import {
   createInstitution,
   getAllInstitutions,
   updateInstitutionStatus,
+  updateInstitution,
+  deleteInstitution
 } from "../controllers/institution.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
+import { uploadInstitutionLogo } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -14,6 +17,7 @@ router.post(
   "/",
   protect,
   allowRoles("SUPER_ADMIN"),
+  uploadInstitutionLogo.single("logo"),
   createInstitution
 );
 
@@ -31,6 +35,21 @@ router.patch(
   protect,
   allowRoles("SUPER_ADMIN"),
   updateInstitutionStatus
+);
+
+router.put(
+  "/:id",
+  protect,
+  allowRoles("SUPER_ADMIN"),
+  uploadInstitutionLogo.single("logo"),
+  updateInstitution
+);
+
+router.delete(
+  "/:id",
+  protect,
+  allowRoles("SUPER_ADMIN"),
+  deleteInstitution
 );
 
 export default router;
