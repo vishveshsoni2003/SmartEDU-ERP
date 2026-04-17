@@ -42,7 +42,7 @@ export const markLectureAttendance = async (req, res) => {
         institutionId: req.user.institutionId,
         lectureId,
         date,
-        facultyId: faculty._id,
+        facultyId: faculty._id,   // Faculty._id — matches LectureAttendance.facultyId ref
         presentStudents,
       },
       { upsert: true, new: true }

@@ -32,7 +32,7 @@ const lectureSchema = new mongoose.Schema(
 
     facultyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Faculty",
       required: true
     },
 
@@ -59,9 +59,14 @@ const lectureSchema = new mongoose.Schema(
       required: true
     },
 
+    room: {
+      type: String,
+      default: ""
+    },
+
     lectureType: {
       type: String,
-      enum: ["THEORY", "LAB"],
+      enum: ["THEORY", "PRACTICAL", "TUTORIAL", "LAB"],
       required: true
     }
   },

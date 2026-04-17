@@ -51,6 +51,8 @@ const DriverHistory = lazy(() => import("./pages/driver/DriverHistory"));
 
 const Settings = lazy(() => import("./pages/Settings"));
 const AdminFinance = lazy(() => import("./pages/admin/AdminFinance"));
+const AdminLectures = lazy(() => import("./pages/admin/AdminLectures"));
+const AdminHolidays = lazy(() => import("./pages/admin/AdminHolidays"));
 const StudentFees  = lazy(() => import("./pages/student/StudentFees"));
 const StudentBusTracking = lazy(() => import("./pages/student/StudentBusTracking"));
 
@@ -96,6 +98,8 @@ function App() {
               <Route path="/admin/hostels" element={<AdminHostels />} />
               <Route path="/admin/transport" element={<AdminTransport />} />
               <Route path="/admin/finance"   element={<AdminFinance />} />
+              <Route path="/admin/lectures" element={<AdminLectures />} />
+              <Route path="/admin/holidays" element={<AdminHolidays />} />
             </Route>
 
             {/* =============================================

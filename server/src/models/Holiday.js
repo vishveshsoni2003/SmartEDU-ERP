@@ -19,6 +19,10 @@ const holidaySchema = new mongoose.Schema(
       type: String,
       enum: ["HOLIDAY", "VACATION"],
       default: "HOLIDAY"
+    },
+    description: {
+      type: String,
+      default: ""
     }
   },
   { timestamps: true }

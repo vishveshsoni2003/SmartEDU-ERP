@@ -4,6 +4,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card from '../../components/ui/Card';
 import LectureAttendance from '../../components/faculty/LectureAttendance';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
 
@@ -16,13 +17,10 @@ export default function FacultyClasses() {
   );
 
   useEffect(() => {
-    api.get("/faculty/dashboard")
-      .then(res => {
-        // Get ALL lectures not just today's — re-fetch without day filter
-        return api.get("/lectures");
-      })
+    // GET /lectures with FACULTY role returns only this faculty's lectures
+    api.get("/lectures")
       .then(res => setLectures(res.data.lectures || []))
-      .catch(() => {})
+      .catch(() => toast.error("Failed to load lectures"))
       .finally(() => setLoading(false));
   }, []);
 

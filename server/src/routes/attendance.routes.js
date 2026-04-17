@@ -1,10 +1,14 @@
-import { getLectureAttendancePercentage, getMentorAttendancePercentage, getLectureAttendanceHistory } from "../controllers/attendance.controller.js";
+import {
+  getLectureAttendancePercentage,
+  getMentorAttendancePercentage,
+  getLectureAttendanceHistory
+} from "../controllers/attendance.controller.js";
 import express from "express";
 import {
   markLectureAttendance,
   markMentorAttendance
 } from "../controllers/attendance.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
+import { protect, isolateTenant } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 
 const router = express.Router();
@@ -12,6 +16,7 @@ const router = express.Router();
 router.post(
   "/lecture",
   protect,
+  isolateTenant,
   allowRoles("FACULTY"),
   markLectureAttendance
 );
@@ -19,6 +24,7 @@ router.post(
 router.post(
   "/mentor",
   protect,
+  isolateTenant,
   allowRoles("FACULTY"),
   markMentorAttendance
 );
@@ -26,13 +32,16 @@ router.post(
 router.get(
   "/lecture/percentage/:studentId",
   protect,
-  allowRoles("STUDENT", "ADMIN"),
+  isolateTenant,
+  allowRoles("STUDENT", "ADMIN", "SUB_ADMIN"),
   getLectureAttendancePercentage
 );
+
 router.get(
   "/mentor/percentage/:studentId",
   protect,
-  allowRoles("STUDENT", "ADMIN"),
+  isolateTenant,
+  allowRoles("STUDENT", "ADMIN", "SUB_ADMIN"),
   getMentorAttendancePercentage
 );
 
@@ -40,7 +49,8 @@ router.get(
 router.get(
   "/lecture/history",
   protect,
-  allowRoles("FACULTY", "ADMIN"),
+  isolateTenant,
+  allowRoles("FACULTY", "ADMIN", "SUB_ADMIN"),
   getLectureAttendanceHistory
 );
 

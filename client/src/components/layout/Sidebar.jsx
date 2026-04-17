@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Calendar, Bus, DollarSign,
-  Settings, LogOut, Menu, X, CheckSquare, BarChart3, Database, Frame, Building, GraduationCap
+  Settings, LogOut, Menu, X, CheckSquare, BarChart3, Database, Frame, Building, GraduationCap, CalendarDays
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +22,8 @@ export default function Sidebar({ user, onLogout }) {
         { label: 'Students',   href: '/admin/users',     icon: Users },
         { label: 'Courses',    href: '/admin/courses',   icon: Database },
         { label: 'Faculty',    href: '/admin/faculty',   icon: GraduationCap },
+        { label: 'Lectures',   href: '/admin/lectures',  icon: CalendarDays },
+        { label: 'Holidays',   href: '/admin/holidays',  icon: Calendar },
         { label: 'Hostels',    href: '/admin/hostels',   icon: Building },
         { label: 'Transport',  href: '/admin/transport', icon: Bus },
         { label: 'Finance',    href: '/admin/finance',   icon: DollarSign },
