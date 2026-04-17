@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Calendar, Bus, DollarSign,
-  Settings, LogOut, Menu, X, CheckSquare, BarChart3, Database, Frame
+  Settings, LogOut, Menu, X, CheckSquare, BarChart3, Database, Frame, Building, GraduationCap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,34 +16,45 @@ export default function Sidebar({ user, onLogout }) {
       { label: 'Attendance', href: '/student/attendance', icon: Calendar },
     ];
 
-    if (user?.role === 'ADMIN') {
+    if (user?.role === 'ADMIN' || user?.role === 'SUB_ADMIN') {
       return [
-        { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-        { label: 'Users & Admissions', href: '/admin/users', icon: Users },
-        { label: 'Academic Rigor', href: '/admin/courses', icon: Database },
-        { label: 'Global Attendance', href: '/admin/attendance', icon: CheckSquare },
-        { label: 'Telemetry & Finance', href: '/admin/reports', icon: BarChart3 },
+        { label: 'Dashboard',  href: '/admin',           icon: LayoutDashboard },
+        { label: 'Students',   href: '/admin/users',     icon: Users },
+        { label: 'Courses',    href: '/admin/courses',   icon: Database },
+        { label: 'Faculty',    href: '/admin/faculty',   icon: GraduationCap },
+        { label: 'Hostels',    href: '/admin/hostels',   icon: Building },
+        { label: 'Transport',  href: '/admin/transport', icon: Bus },
+        { label: 'Finance',    href: '/admin/finance',   icon: DollarSign },
+        { label: 'Reports',    href: '/admin/reports',   icon: BarChart3 },
       ];
     }
 
     if (user?.role === 'FACULTY') {
       return [
-        { label: 'Dashboard', href: '/faculty', icon: LayoutDashboard },
-        { label: 'My Classes', href: '/faculty/classes', icon: Users },
-        { label: 'Attendance Matrix', href: '/faculty/attendance', icon: CheckSquare },
-        { label: 'Grade Distributions', href: '/faculty/grades', icon: BarChart3 },
+        { label: 'Dashboard',  href: '/faculty',            icon: LayoutDashboard },
+        { label: 'My Classes', href: '/faculty/classes',    icon: Users },
+        { label: 'Attendance', href: '/faculty/attendance', icon: CheckSquare },
+        { label: 'Grades',     href: '/faculty/grades',     icon: BarChart3 },
+        { label: 'Transport',  href: '/faculty/transport',  icon: Bus },
       ];
     }
 
     if (user?.role === 'DRIVER') {
       return [
-        { label: 'Dashboard', href: '/driver', icon: LayoutDashboard },
-        { label: 'Active Routes', href: '/driver/routes', icon: Bus },
-        { label: 'Log Histories', href: '/driver/history', icon: Calendar },
+        { label: 'Dashboard', href: '/driver',         icon: LayoutDashboard },
+        { label: 'My Route',  href: '/driver/routes',  icon: Bus },
+        { label: 'History',   href: '/driver/history', icon: Calendar },
       ];
     }
 
-    return baseItems;
+    // STUDENT default
+    return [
+      { label: 'Dashboard',    href: '/student',              icon: LayoutDashboard },
+      { label: 'Attendance',   href: '/student/attendance',   icon: Calendar },
+      { label: 'Track My Bus', href: '/student/bus-tracking', icon: Bus },
+      { label: 'My Fees',      href: '/student/fees',         icon: DollarSign },
+      { label: 'Applications', href: '/student/applications', icon: CheckSquare },
+    ];
   };
 
   const navItems = getNavItems();
@@ -124,7 +135,7 @@ export default function Sidebar({ user, onLogout }) {
             className="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:hover:text-white transition font-bold text-sm mb-1"
           >
             <Settings size={20} className="text-slate-400 dark:text-slate-500" />
-            <span>Node Parameters</span>
+            <span>Settings</span>
           </Link>
           <button
             onClick={() => {
@@ -134,7 +145,7 @@ export default function Sidebar({ user, onLogout }) {
             className="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition font-bold text-sm"
           >
             <LogOut size={20} className="text-rose-500 dark:text-rose-400" />
-            <span>Terminate Subnet</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

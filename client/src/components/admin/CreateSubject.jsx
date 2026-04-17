@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import api from "../../services/api";
 
-export default function CreateSubject({ onCreated }) {
+export default function CreateSubject({ onCreated, refreshKey = 0 }) {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     courseId: "",
@@ -14,52 +15,54 @@ export default function CreateSubject({ onCreated }) {
 
   useEffect(() => {
     api.get("/courses").then((res) => {
-      setCourses(res.data.courses || []);
+      setCourses(res.data.courses || res.data || []);
     });
-  }, []);
+  }, [refreshKey]);
 
-  const submit = async () => {
+  const submit = async (e) => {
+    e?.preventDefault();
     const { courseId, name, code, year, semester, type } = form;
 
     if (!courseId || !name || !code || !year || !semester) {
-      return alert("All fields are required");
+      return toast.error("All subject parameters are required");
     }
 
-    await api.post("/subjects", {
-      courseId,
-      name,
-      code,
-      year: Number(year),
-      semester: Number(semester),
-      type
-    });
+    try {
+      await api.post("/subjects", {
+        courseId,
+        name,
+        code,
+        year: Number(year),
+        semester: Number(semester),
+        type
+      });
 
-    alert("Subject created successfully");
+      toast.success("Subject module instantiated successfully");
 
-    setForm({
-      courseId: "",
-      name: "",
-      code: "",
-      year: "",
-      semester: "",
-      type: "THEORY"
-    });
-    if (onCreated) onCreated();
+      setForm({
+        courseId: "",
+        name: "",
+        code: "",
+        year: "",
+        semester: "",
+        type: "THEORY"
+      });
+      if (onCreated) onCreated();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to create subject");
+    }
   };
 
   return (
-    <div className="bg-white border rounded-xl p-6">
-      <h3 className="font-semibold mb-4">Create Subject</h3>
-
-      {/* COURSE */}
+    <form className="space-y-4" onSubmit={submit}>
       <select
-        className="border p-2 w-full mb-2"
+        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
         value={form.courseId}
         onChange={(e) =>
           setForm({ ...form, courseId: e.target.value })
         }
       >
-        <option value="">Select Course</option>
+        <option value="">Select Target Course</option>
         {courses.map((c) => (
           <option key={c._id} value={c._id}>
             {c.name}
@@ -67,66 +70,65 @@ export default function CreateSubject({ onCreated }) {
         ))}
       </select>
 
-      {/* SUBJECT NAME */}
       <input
-        className="border p-2 w-full mb-2"
-        placeholder="Subject Name"
+        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
+        placeholder="Subject Name (e.g. Data Structures)"
         value={form.name}
         onChange={(e) =>
           setForm({ ...form, name: e.target.value })
         }
       />
 
-      {/* SUBJECT CODE */}
-      <input
-        className="border p-2 w-full mb-2"
-        placeholder="Subject Code"
-        value={form.code}
-        onChange={(e) =>
-          setForm({ ...form, code: e.target.value })
-        }
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <input
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
+          placeholder="Subject Code"
+          value={form.code}
+          onChange={(e) =>
+            setForm({ ...form, code: e.target.value })
+          }
+        />
 
-      {/* YEAR */}
-      <input
-        className="border p-2 w-full mb-2"
-        placeholder="Year"
-        type="number"
-        value={form.year}
-        onChange={(e) =>
-          setForm({ ...form, year: e.target.value })
-        }
-      />
+        <input
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
+          placeholder="Year"
+          type="number"
+          value={form.year}
+          onChange={(e) =>
+            setForm({ ...form, year: e.target.value })
+          }
+        />
+      </div>
 
-      {/* SEMESTER */}
-      <input
-        className="border p-2 w-full mb-2"
-        placeholder="Semester"
-        type="number"
-        value={form.semester}
-        onChange={(e) =>
-          setForm({ ...form, semester: e.target.value })
-        }
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <input
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
+          placeholder="Semester"
+          type="number"
+          value={form.semester}
+          onChange={(e) =>
+            setForm({ ...form, semester: e.target.value })
+          }
+        />
 
-      {/* TYPE */}
-      <select
-        className="border p-2 w-full mb-4"
-        value={form.type}
-        onChange={(e) =>
-          setForm({ ...form, type: e.target.value })
-        }
-      >
-        <option value="THEORY">Theory</option>
-        <option value="LAB">Lab</option>
-      </select>
+        <select
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
+          value={form.type}
+          onChange={(e) =>
+            setForm({ ...form, type: e.target.value })
+          }
+        >
+          <option value="THEORY">Theory Node</option>
+          <option value="LAB">Lab Practical</option>
+        </select>
+      </div>
 
       <button
-        onClick={submit}
-        className="bg-black text-white px-4 py-2 rounded"
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-blue-600/20"
       >
-        Create Subject
+        Compile Subject Definition
       </button>
-    </div>
+    </form>
   );
 }

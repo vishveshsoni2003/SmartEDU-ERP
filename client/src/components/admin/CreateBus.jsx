@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
-import { Bus, AlertCircle, CheckCircle, Loader } from "lucide-react";
+import toast from "react-hot-toast";
+import { Bus, Loader } from "lucide-react";
 import { createBus, getAllRoutes } from "../../services/adminApi";
 import Button from "../ui/Button";
-import Input from "../ui/Input";
-import Alert from "../ui/Alert";
 import Card from "../ui/Card";
 
-export default function CreateBus({ onCreated }) {
+export default function CreateBus({ onCreated, refreshKey = 0 }) {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [routesLoading, setRoutesLoading] = useState(true);
   const [form, setForm] = useState({
     busNumber: "",
@@ -20,17 +17,15 @@ export default function CreateBus({ onCreated }) {
 
   useEffect(() => {
     fetchRoutes();
-  }, []);
+  }, [refreshKey]);
 
   const fetchRoutes = async () => {
     try {
       setRoutesLoading(true);
       const data = await getAllRoutes();
       setRoutes(data.routes || []);
-      setError("");
     } catch (err) {
-      console.error("Error fetching routes:", err);
-      setError(err.response?.data?.message || "Failed to load routes");
+      toast.error(err.response?.data?.message || "Failed to load routes");
     } finally {
       setRoutesLoading(false);
     }
@@ -39,20 +34,19 @@ export default function CreateBus({ onCreated }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    setError(""); // Clear error when user starts typing
   };
 
   const validate = () => {
     if (!form.busNumber.trim()) {
-      setError("Please enter a bus number");
+      toast.error("Please enter a valid bus registry number");
       return false;
     }
     if (!form.capacity || parseInt(form.capacity) < 1) {
-      setError("Please enter a valid capacity (minimum 1)");
+      toast.error("Bus physical capacity cannot be sub-zero");
       return false;
     }
     if (!form.routeId) {
-      setError("Please select a route");
+      toast.error("Please allocate an active route vector");
       return false;
     }
     return true;
@@ -70,22 +64,16 @@ export default function CreateBus({ onCreated }) {
       };
 
       console.log("Creating bus:", busData);
-      const response = await createBus(busData);
-      console.log("Bus created successfully:", response);
+      await createBus(busData);
+      toast.success("Transit vehicle successfully provisioned!");
 
-      setSuccess(true);
       setForm({ busNumber: "", capacity: "", routeId: "" });
 
       if (onCreated) {
         onCreated();
       }
-
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("Error creating bus:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Failed to create bus";
-      setError(errorMessage);
+      toast.error(err.response?.data?.message || "Failed to provision asset");
     } finally {
       setLoading(false);
     }
@@ -95,45 +83,23 @@ export default function CreateBus({ onCreated }) {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <Alert variant="error" icon={AlertCircle} onClose={() => setError("")}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert variant="success" icon={CheckCircle}>
-          Bus created successfully!
-        </Alert>
-      )}
-
       <div className="space-y-4">
         {/* Bus number */}
-        <Input
-          label="Bus Number"
-          placeholder="e.g., BUS-001, Route A Bus 1"
-          name="busNumber"
-          value={form.busNumber}
-          onChange={handleChange}
-          disabled={loading}
-        />
+        <div>
+          <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5 tracking-wide">Registry Plate</label>
+          <input name="busNumber" value={form.busNumber} onChange={handleChange} placeholder="e.g., BUS-001, Route A Bus 1" disabled={loading} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors" />
+        </div>
 
         {/* Capacity */}
-        <Input
-          label="Capacity (Number of Seats)"
-          placeholder="e.g., 50"
-          type="number"
-          name="capacity"
-          value={form.capacity}
-          onChange={handleChange}
-          disabled={loading}
-          min="1"
-        />
+        <div>
+          <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5 tracking-wide">Seat Availability</label>
+          <input type="number" name="capacity" value={form.capacity} onChange={handleChange} placeholder="e.g., 50" min="1" disabled={loading} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors" />
+        </div>
 
         {/* Route selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select Route *
+          <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5 tracking-wide">
+            Assigned Vector *
           </label>
           {routesLoading ? (
             <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -152,12 +118,12 @@ export default function CreateBus({ onCreated }) {
               value={form.routeId}
               onChange={handleChange}
               disabled={loading || routes.length === 0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
             >
-              <option value="">-- Select a route --</option>
+              <option value="">-- Assign a route vector --</option>
               {routes.map((route) => (
                 <option key={route._id} value={route._id}>
-                  {route.routeName} ({route.stops.length} stops)
+                  {route.routeName} ({route.stops.length} physical stops)
                 </option>
               ))}
             </select>

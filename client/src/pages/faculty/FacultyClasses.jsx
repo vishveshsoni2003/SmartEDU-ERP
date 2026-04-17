@@ -1,87 +1,133 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Clock, MapPin, Plus } from 'lucide-react';
+import { Users, Clock, BookOpen, Calendar, ChevronRight } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useAuth } from '../../context/AuthContext';
+import Card from '../../components/ui/Card';
+import LectureAttendance from '../../components/faculty/LectureAttendance';
 import api from '../../services/api';
 
+const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+
 export default function FacultyClasses() {
-  const { user } = useAuth();
-  const [classes, setClasses] = useState([]);
+  const [lectures, setLectures] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLecture, setSelectedLecture] = useState(null);
+  const [activeDay, setActiveDay] = useState(
+    new Date().toLocaleString("en-US", { weekday: "long" }).toUpperCase()
+  );
 
   useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        setLoading(true);
-        // Fetch faculty's timetable
-        const response = await api.get('/timetable');
-        const classesData = response.data?.lectures?.map((lecture, idx) => ({
-          id: lecture._id || idx,
-          name: lecture.subject?.name || 'Unknown',
-          section: lecture.section || 'A',
-          time: `${lecture.startTime || '09:00 AM'} - ${lecture.endTime || '10:30 AM'}`,
-          room: lecture.room || `Room ${100 + idx}`,
-          students: Math.floor(Math.random() * 50) + 30
-        })) || [];
-        setClasses(classesData);
-      } catch (err) {
-        console.error('Error fetching classes:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    api.get("/faculty/dashboard")
+      .then(res => {
+        // Get ALL lectures not just today's — re-fetch without day filter
+        return api.get("/lectures");
+      })
+      .then(res => setLectures(res.data.lectures || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-    fetchClasses();
-  }, [user.id]);
+  const filtered = lectures.filter(l => l.day === activeDay);
+
+  if (selectedLecture) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <button
+            onClick={() => setSelectedLecture(null)}
+            className="flex items-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            ← Back to My Classes
+          </button>
+          <LectureAttendance
+            lecture={selectedLecture}
+            onClose={() => setSelectedLecture(null)}
+          />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <DashboardLayout sidebar user={user}>
-      <div className="max-w-6xl">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <Users size={32} className="text-blue-600" />
-              My Classes
-            </h1>
-            <p className="text-gray-600 mt-2">View and manage your assigned classes</p>
-          </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
-            <Plus size={20} />
-            Schedule Class
-          </button>
+    <DashboardLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+            <BookOpen className="text-blue-600 h-9 w-9" /> My Classes
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
+            View your assigned lectures and mark attendance.
+          </p>
         </div>
 
-        {/* Classes Grid */}
+        {/* Day tabs */}
+        <div className="flex gap-1.5 flex-wrap">
+          {DAYS.map(day => (
+            <button
+              key={day}
+              onClick={() => setActiveDay(day)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeDay === day
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+              }`}
+            >
+              {day.substring(0, 3)}
+            </button>
+          ))}
+        </div>
+
         {loading ? (
-          <div className="text-center py-8 text-gray-500">Loading classes...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+            {[1,2,3,4].map(i => <div key={i} className="h-40 bg-slate-100 dark:bg-slate-800 rounded-2xl" />)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20">
+            <Calendar className="h-14 w-14 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+            <p className="font-bold text-slate-500 dark:text-slate-400">No lectures on {activeDay.toLowerCase()}.</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {classes.map((cls) => (
-              <div key={cls.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 hover:shadow-lg transition">
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{cls.name}</h3>
-                  <p className="text-sm text-gray-600">Section {cls.section}</p>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <Clock size={18} className="text-blue-600" />
-                    <span className="text-sm">{cls.time}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filtered
+              .sort((a, b) => a.startTime?.localeCompare(b.startTime))
+              .map((lec) => (
+                <Card key={lec._id} shadow="md" padding="lg" className="hover:border-blue-200 dark:hover:border-blue-800 transition group">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                        {lec.subjectId?.name || "Subject"}
+                      </h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                        {lec.courseId?.name || "Course"} · Y{lec.year} · Sec {lec.section}
+                      </p>
+                    </div>
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                      lec.lectureType === "PRACTICAL"
+                        ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400"
+                        : lec.lectureType === "TUTORIAL"
+                        ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                        : "bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400"
+                    }`}>
+                      {lec.lectureType || "THEORY"}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <MapPin size={18} className="text-blue-600" />
-                    <span className="text-sm">{cls.room}</span>
+
+                  <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400 mb-4">
+                    <span className="flex items-center gap-1.5 font-mono">
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      {lec.startTime}–{lec.endTime}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <Users size={18} className="text-blue-600" />
-                    <span className="text-sm">{cls.students} Students</span>
-                  </div>
-                </div>
-                <button className="mt-4 w-full bg-blue-50 text-blue-600 py-2 rounded-lg hover:bg-blue-100 font-medium">
-                  Manage Class
-                </button>
-              </div>
-            ))}
+
+                  <button
+                    onClick={() => setSelectedLecture(lec)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-bold rounded-xl text-sm transition-all group-hover:shadow-sm"
+                  >
+                    Mark Attendance
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </Card>
+              ))
+            }
           </div>
         )}
       </div>

@@ -13,6 +13,18 @@ export const createStudent = async (data) => {
   const res = await API.post("/students", data);
   return res.data;
 };
+
+// Update student
+export const updateStudent = async (id, data) => {
+  const res = await API.put(`/students/${id}`, data);
+  return res.data;
+};
+
+// Delete student
+export const deleteStudent = async (id) => {
+  const res = await API.delete(`/students/${id}`);
+  return res.data;
+};
 // ================= FACULTY =================
 
 // Get all faculty
@@ -24,6 +36,18 @@ export const getAllFaculty = async () => {
 // Create faculty
 export const createFaculty = async (data) => {
   const res = await API.post("/faculty", data);
+  return res.data;
+};
+
+// Update faculty
+export const updateFaculty = async (id, data) => {
+  const res = await API.put(`/faculty/${id}`, data);
+  return res.data;
+};
+
+// Delete faculty
+export const deleteFaculty = async (id) => {
+  const res = await API.delete(`/faculty/${id}`);
   return res.data;
 };
 // ================= NOTICES =================
@@ -113,6 +137,12 @@ export const createInstitutionAdmin = async (data) => {
   const res = await API.post("/admin/create-admin", data);
   return res.data;
 };
+
+// Toggle admin active/deactivated status
+export const toggleAdminStatus = async (id) => {
+  const res = await API.patch(`/admin/admins/${id}/toggle-status`);
+  return res.data;
+};
 // ROUTES
 
 
@@ -122,3 +152,33 @@ export const getRoutes = async () => {
 };
 
 
+
+// Get all drivers
+export const getAllDrivers = async () => {
+  const res = await API.get("/transport/drivers");
+  return res.data;
+};
+
+// Create driver
+export const createDriver = async (data) => {
+  const res = await API.post("/drivers", data);
+  return res.data;
+};
+
+// Delete driver
+export const deleteDriver = async (driverId) => {
+  const res = await API.delete(`/drivers/${driverId}`);
+  return res.data;
+};
+
+// Assign bus to driver
+export const assignBusToDriver = async (data) => {
+  const res = await API.post("/transport/assign-driver", data);
+  return res.data;
+};
+
+// Unassign bus from driver
+export const unassignBusFromDriver = async (driverId) => {
+  const res = await API.delete(`/transport/drivers/${driverId}/unassign`);
+  return res.data;
+};

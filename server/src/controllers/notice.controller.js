@@ -132,8 +132,14 @@ export const getNotices = asyncHandler(async (req, res) => {
   }
 
   if (req.user.role === "ADMIN" || req.user.role === "SUPER_ADMIN") {
+    // Admins see all — no extra filter
   } else if (req.user.role === "FACULTY") {
-    filter.targetAudience = { $in: ["ALL", "FACULTY"] };
+    if (req.query.mine === "true") {
+      // Faculty fetching their own published notices
+      filter.postedBy = req.user.userId;
+    } else {
+      filter.targetAudience = { $in: ["ALL", "FACULTY"] };
+    }
   } else if (req.user.role === "STUDENT") {
     const student = await Student.findOne({ userId: req.user.userId });
 

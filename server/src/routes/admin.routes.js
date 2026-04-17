@@ -4,7 +4,8 @@ import { allowRoles } from "../middlewares/role.middleware.js";
 import {
   createInstitutionAdmin,
   getAdminStats,
-  getInstitutionAdmins
+  getInstitutionAdmins,
+  toggleAdminStatus
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -24,6 +25,7 @@ router.get(
   allowRoles("ADMIN"),
   getInstitutionAdmins
 );
+
 router.get(
   "/stats",
   protect,
@@ -31,5 +33,12 @@ router.get(
   getAdminStats
 );
 
+// Toggle admin active/deactivated status
+router.patch(
+  "/admins/:id/toggle-status",
+  protect,
+  allowRoles("ADMIN"),
+  toggleAdminStatus
+);
 
 export default router;

@@ -24,15 +24,17 @@ export const parseBufferToJSON = (buffer) => {
 };
 
 /**
- * Trims all string values in an object to prevent leading/trailing whitespace errors
+ * Trims all string values in an object to prevent leading/trailing whitespace errors.
+ * Also normalizes all KEYS to lowercase so template headers are case-insensitive.
  */
 export const sanitizeRow = (row) => {
     const sanitized = {};
     for (const key in row) {
+        const normalizedKey = key.trim().toLowerCase();
         if (typeof row[key] === "string") {
-            sanitized[key.trim()] = row[key].trim();
+            sanitized[normalizedKey] = row[key].trim();
         } else {
-            sanitized[key.trim()] = row[key];
+            sanitized[normalizedKey] = row[key];
         }
     }
     return sanitized;

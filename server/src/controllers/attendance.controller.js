@@ -154,7 +154,7 @@ export const getLectureAttendancePercentage = async (req, res) => {
 
       totalLectures++;
 
-      if (a.presentStudents.includes(student._id)) {
+      if (a.presentStudents.map(id => id.toString()).includes(student._id.toString())) {
         attendedLectures++;
       }
     });
@@ -217,7 +217,7 @@ export const getMentorAttendancePercentage = async (req, res) => {
 
       totalSessions++;
 
-      if (a.presentStudents.includes(student._id)) {
+      if (a.presentStudents.map(id => id.toString()).includes(student._id.toString())) {
         attendedSessions++;
       }
     });
@@ -231,6 +231,75 @@ export const getMentorAttendancePercentage = async (req, res) => {
           ? 0
           : ((attendedSessions / totalSessions) * 100).toFixed(2)
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * GET LECTURE ATTENDANCE HISTORY (FACULTY)
+ * Returns attendance records for all lectures assigned to this faculty
+ */
+export const getLectureAttendanceHistory = async (req, res) => {
+  try {
+    const faculty = await Faculty.findOne({ userId: req.user.userId });
+    if (!faculty) {
+      return res.status(404).json({ message: "Faculty profile not found" });
+    }
+
+    const { lectureId, from, to } = req.query;
+
+    // Get lectures belonging to this faculty
+    const lectureFilter = {
+      institutionId: req.user.institutionId,
+      facultyId: faculty._id
+    };
+    if (lectureId) lectureFilter._id = lectureId;
+
+    const lectures = await Lecture.find(lectureFilter)
+      .populate("subjectId", "name code")
+      .populate("courseId", "name");
+
+    const lectureIds = lectures.map(l => l._id);
+
+    // Build attendance filter
+    const attFilter = { lectureId: { $in: lectureIds } };
+    if (from || to) {
+      attFilter.date = {};
+      if (from) attFilter.date.$gte = new Date(from);
+      if (to)   attFilter.date.$lte = new Date(to);
+    }
+
+    const records = await LectureAttendance.find(attFilter)
+      .populate({
+        path: "lectureId",
+        populate: [
+          { path: "subjectId", select: "name code" },
+          { path: "courseId", select: "name" }
+        ]
+      })
+      .sort({ date: -1 })
+      .limit(100);
+
+    // Enrich each record with present count
+    const enriched = records.map(r => ({
+      _id: r._id,
+      date: r.date,
+      lecture: {
+        _id: r.lectureId?._id,
+        subject: r.lectureId?.subjectId?.name,
+        course: r.lectureId?.courseId?.name,
+        year: r.lectureId?.year,
+        section: r.lectureId?.section,
+        day: r.lectureId?.day,
+        startTime: r.lectureId?.startTime,
+        endTime: r.lectureId?.endTime
+      },
+      presentCount: r.presentStudents?.length || 0,
+      presentStudents: r.presentStudents
+    }));
+
+    res.json({ records: enriched, total: enriched.length });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

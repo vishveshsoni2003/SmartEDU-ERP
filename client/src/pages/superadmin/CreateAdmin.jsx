@@ -18,18 +18,26 @@ export default function CreateAdmin() {
   }, []);
 
   const submit = async () => {
-    await API.post("/super-admin/create-admin", form);
-    toast.success("Admin created");
+    if (!form.institutionId || !form.name || !form.email || !form.password) {
+      return toast.error("Please fill all fields");
+    }
+    try {
+      await API.post("/super-admin/create-admin", form);
+      toast.success("Admin created successfully");
+      setForm({ ...form, name: "", email: "", password: "" });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to create Admin");
+    }
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border">
-      <h3 className="text-lg font-semibold mb-4">
+    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border dark:border-slate-800 shadow-sm">
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
         Create Institution Admin
       </h3>
 
       <select
-        className="border p-2 w-full mb-3"
+        className="border dark:border-slate-700 bg-transparent dark:text-white dark:bg-slate-800 p-2 w-full mb-3 rounded outline-none focus:ring-2 focus:ring-blue-500"
         onChange={(e) =>
           setForm({ ...form, institutionId: e.target.value })
         }
@@ -44,20 +52,20 @@ export default function CreateAdmin() {
 
       <input
         placeholder="Name"
-        className="border p-2 w-full mb-2"
+        className="border dark:border-slate-700 bg-transparent dark:text-white p-2 w-full mb-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
         onChange={(e) => setForm({ ...form, name: e.target.value })}
       />
 
       <input
         placeholder="Email"
-        className="border p-2 w-full mb-2"
+        className="border dark:border-slate-700 bg-transparent dark:text-white p-2 w-full mb-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
         onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
 
       <input
         placeholder="Password"
         type="password"
-        className="border p-2 w-full mb-3"
+        className="border dark:border-slate-700 bg-transparent dark:text-white p-2 w-full mb-4 rounded outline-none focus:ring-2 focus:ring-blue-500"
         onChange={(e) => setForm({ ...form, password: e.target.value })}
       />
 

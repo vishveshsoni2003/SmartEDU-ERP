@@ -49,9 +49,7 @@ export const createFaculty = asyncHandler(async (req, res) => {
       institutionId: req.user.institutionId,
       profileImage,
       employeeId,
-      facultyType,
-      departmentId,
-      designation,
+      facultyType
     });
   } catch (dbError) {
     if (req.file) await deleteFromCloudinary(req.file.filename);

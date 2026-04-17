@@ -9,6 +9,7 @@ import FacultyNotices from "../../components/faculty/FacultyNotices";
 import CreateNotice from "../../components/faculty/CreateNotice";
 import MentorAttendance from "../../components/faculty/MentorAttendance";
 import UpcomingHolidays from "../../components/student/UpcomingHolidays";
+import toast from "react-hot-toast";
 
 import api from "../../services/api";
 import { Clock, CheckCircle, Users, Bell, BookOpen, Award, Calendar } from "lucide-react";
@@ -48,7 +49,14 @@ export default function FacultyDashboard() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={async () => { await api.post("/faculty-attendance/mark"); alert("✓ Recorded presence successfully."); }} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-emerald-500/20">
+            <button onClick={async () => {
+              try {
+                await api.post("/faculty-attendance/mark");
+                toast.success("Presence recorded successfully");
+              } catch (err) {
+                toast.error(err.response?.data?.message || "Failed to record presence");
+              }
+            }} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-emerald-500/20">
               <CheckCircle size={18} /> Signal Presence Array
             </button>
           </div>

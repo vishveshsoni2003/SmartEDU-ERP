@@ -1,133 +1,94 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Bus, MapPin, Clock, Users } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
 export default function DriverRoutes() {
-  const { user } = useAuth();
-  const [routes, setRoutes] = useState([]);
+  const [bus, setBus] = useState(null);
+  const [route, setRoute] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRoutes = async () => {
-      try {
-        setLoading(true);
-        // Fetch driver dashboard with assigned routes
-        const response = await api.get('/drivers/dashboard');
-        const bus = response.data?.bus;
-        
-        if (bus && bus.route) {
-          const routesData = [{
-            id: bus._id,
-            name: bus.routeName || `Route ${bus.number}`,
-            startPoint: bus.route.startPoint || 'Central Station',
-            endPoint: bus.route.endPoint || 'Campus Main Gate',
-            departure: '07:00 AM',
-            arrival: '08:30 AM',
-            stops: bus.route.stops?.length || 8,
-            passengers: bus.currentPassengers || Math.floor(Math.random() * 30) + 20,
-            distance: bus.route.distance || '25 km',
-            status: 'Scheduled'
-          }];
-          setRoutes(routesData);
-        }
-      } catch (err) {
-        console.error('Error fetching routes:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRoutes();
-  }, [user.id]);
+    api.get('/drivers/dashboard')
+      .then(r => {
+        setBus(r.data.bus);
+        if (r.data.bus?.routeId) setRoute(r.data.bus.routeId);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
-    <DashboardLayout sidebar user={user}>
-      <div className="max-w-6xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Bus size={32} className="text-blue-600" />
-            My Routes
+    <DashboardLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+            <Bus className="text-blue-600 h-9 w-9" /> My Route
           </h1>
-          <p className="text-gray-600 mt-2">View and manage your assigned bus routes</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">Your assigned bus route and stops.</p>
         </div>
 
-        {/* Routes List */}
         {loading ? (
-          <div className="text-center py-8 text-gray-500">Loading routes...</div>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+            <div className="h-64 bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+          </div>
+        ) : !bus ? (
+          <div className="text-center py-20">
+            <Bus className="h-14 w-14 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+            <p className="font-bold text-slate-500 dark:text-slate-400">No bus assigned yet.</p>
+          </div>
         ) : (
-          <div className="space-y-4">
-            {routes.map((route) => (
-              <div key={route.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 hover:shadow-lg transition">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{route.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      <span className="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
-                        {route.status}
-                      </span>
-                    </p>
-                  </div>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Start Route
-                  </button>
+          <>
+            {/* Bus summary */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Bus {bus.busNumber}</h2>
+                  {route && <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{route.routeName}</p>}
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <MapPin size={18} className="text-blue-600" />
-                    <div>
-                      <p className="text-xs text-gray-600">From</p>
-                      <p className="text-sm font-medium text-gray-900">{route.startPoint}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin size={18} className="text-blue-600" />
-                    <div>
-                      <p className="text-xs text-gray-600">To</p>
-                      <p className="text-sm font-medium text-gray-900">{route.endPoint}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Clock size={18} className="text-blue-600" />
-                    <div>
-                      <p className="text-xs text-gray-600">Departure</p>
-                      <p className="text-sm font-medium text-gray-900">{route.departure}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Clock size={18} className="text-blue-600" />
-                    <div>
-                      <p className="text-xs text-gray-600">Arrival</p>
-                      <p className="text-sm font-medium text-gray-900">{route.arrival}</p>
-                    </div>
-                  </div>
+                <span className="inline-flex items-center px-3 py-1.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
+                  Scheduled
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Capacity</p>
+                  <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{bus.capacity} seats</p>
                 </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Stops</p>
+                  <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{route?.stops?.length || 0}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Status</p>
+                  <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">Active</p>
+                </div>
+              </div>
+            </div>
 
-                <div className="border-t border-gray-100 pt-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-gray-600">Distance</p>
-                      <p className="text-lg font-semibold text-gray-900">{route.distance}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Stops</p>
-                      <p className="text-lg font-semibold text-gray-900">{route.stops}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 flex items-center gap-1">
-                        <Users size={14} />
-                        Passengers
-                      </p>
-                      <p className="text-lg font-semibold text-gray-900">{route.passengers}</p>
-                    </div>
+            {/* Stops */}
+            {route?.stops?.length > 0 && (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                <h3 className="font-bold text-slate-900 dark:text-white mb-4">Route Stops</h3>
+                <div className="relative">
+                  {/* connector line */}
+                  <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 dark:bg-slate-700" />
+                  <div className="space-y-3">
+                    {route.stops.sort((a, b) => a.order - b.order).map((stop, i) => (
+                      <div key={i} className="flex items-center gap-4 relative">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 z-10 ${i === 0 || i === route.stops.length - 1 ? "bg-blue-600" : "bg-slate-400 dark:bg-slate-600"}`}>
+                          {stop.order}
+                        </div>
+                        <div className="flex-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5">
+                          <p className="font-semibold text-slate-900 dark:text-white text-sm">{stop.name}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </DashboardLayout>

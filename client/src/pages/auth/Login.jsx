@@ -40,9 +40,7 @@ export default function Login() {
         let redirectPath = '/login';
         const role = user.role?.toUpperCase().trim();
 
-        if (role === 'FACULTY' && user.facultyType?.includes('TRANSPORT_MANAGER')) {
-          redirectPath = '/driver';
-        } else if (role === 'SUPER_ADMIN') {
+        if (role === 'SUPER_ADMIN') {
           redirectPath = '/super-admin/dashboard';
         } else if (role === 'ADMIN' || role === 'SUB_ADMIN') {
           redirectPath = '/admin';

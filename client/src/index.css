@@ -80,7 +80,7 @@ h6 {
 }
 
 p {
-  @apply text-gray-600 leading-relaxed;
+  @apply text-gray-600 dark:text-slate-400 leading-relaxed;
 }
 
 a {
@@ -110,11 +110,11 @@ select:focus {
 input:disabled,
 textarea:disabled,
 select:disabled {
-  @apply bg-gray-100 text-gray-400 cursor-not-allowed;
+  @apply bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 cursor-not-allowed;
 }
 
 label {
-  @apply block font-medium text-sm text-gray-700 mb-2;
+  @apply block font-medium text-sm text-gray-700 dark:text-slate-300 mb-2;
 }
 
 /* ================================================================
@@ -122,11 +122,11 @@ label {
    ================================================================ */
 
 .glass {
-  @apply bg-white border border-gray-200;
+  @apply bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800;
 }
 
 .card {
-  @apply bg-white rounded-lg shadow-sm hover:shadow-md transition;
+  @apply bg-white dark:bg-slate-900 rounded-lg shadow-sm hover:shadow-md transition;
 }
 
 /* ================================================================

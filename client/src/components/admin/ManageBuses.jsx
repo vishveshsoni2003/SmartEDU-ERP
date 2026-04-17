@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
-import { Trash2, Bus as BusIcon, AlertCircle, CheckCircle, Loader } from "lucide-react";
+import toast from "react-hot-toast";
+import { Trash2, Bus as BusIcon, Loader } from "lucide-react";
 import { getAllBuses, deleteBus } from "../../services/adminApi";
-import Button from "../ui/Button";
-import Alert from "../ui/Alert";
-import Card from "../ui/Card";
 
 export default function ManageBuses() {
   const [buses, setBuses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [deletingId, setDeletingId] = useState(null);
 
   // Load buses on mount
@@ -22,37 +18,36 @@ export default function ManageBuses() {
       setLoading(true);
       const data = await getAllBuses();
       setBuses(data.buses || []);
-      setError("");
     } catch (err) {
-      console.error("Error fetching buses:", err);
-      setError(err.response?.data?.message || "Failed to load buses");
+      toast.error(err.response?.data?.message || "Failed to load bus manifest");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (busId) => {
-    if (!window.confirm("Are you sure you want to delete this bus?")) {
-      return;
-    }
-
-    try {
-      setDeletingId(busId);
-      await deleteBus(busId);
-      
-      // Remove from list
-      setBuses(buses.filter(b => b._id !== busId));
-      setSuccess("Bus deleted successfully!");
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      console.error("Error deleting bus:", err);
-      const errorMsg = err.response?.data?.message || "Failed to delete bus";
-      setError(errorMsg);
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDelete = (busId) => {
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <p className="font-bold text-slate-900 tracking-tight">Retire and erase this transit vehicle?</p>
+        <p className="text-sm text-slate-500 font-medium">This cannot be undone and will impact student routes.</p>
+        <div className="flex gap-2 justify-end mt-2">
+          <button onClick={() => toast.dismiss(t.id)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-sm font-bold transition-colors">Cancel</button>
+          <button onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              setDeletingId(busId);
+              await deleteBus(busId);
+              setBuses((prev) => prev.filter(b => b._id !== busId));
+              toast.success("Transit vehicle decommissioned!");
+            } catch (err) {
+              toast.error(err.response?.data?.message || "Failed to erase vehicle");
+            } finally {
+              setDeletingId(null);
+            }
+          }} className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-bold shadow-lg shadow-amber-600/20 transition-all">Decommission</button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' });
   };
 
   if (loading) {
@@ -65,61 +60,51 @@ export default function ManageBuses() {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <Alert variant="error" icon={AlertCircle} onClose={() => setError("")}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert variant="success" icon={CheckCircle} onClose={() => setSuccess("")}>
-          {success}
-        </Alert>
-      )}
-
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Existing Buses</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage buses assigned to routes.
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Active Transit Vehicles</h3>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+            Manage provisioned transit vehicles to map against structural nodes.
           </p>
         </div>
-        <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
-          {buses.length} bus{buses.length !== 1 ? 'es' : ''}
+        <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400 text-sm font-black tracking-widest uppercase">
+          {buses.length} component{buses.length !== 1 ? 's' : ''}
         </span>
       </div>
 
       {buses.length === 0 ? (
-        <Card className="p-8 text-center">
-          <BusIcon className="mx-auto text-gray-400 mb-3" size={32} />
-          <p className="text-gray-600">No buses created yet. Create one using the form above.</p>
-        </Card>
+        <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-800 border-dashed">
+          <BusIcon className="mx-auto text-slate-400 mb-3" size={32} />
+          <p className="text-slate-600 dark:text-slate-400 font-bold">No operational transit modules discovered.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {buses.map((bus) => (
-            <Card key={bus._id} className="p-4 hover:shadow-md transition">
+            <div key={bus._id} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-amber-300 dark:hover:border-amber-800 transition-all">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BusIcon className="text-blue-500 flex-shrink-0" size={20} />
-                    <h4 className="font-semibold text-gray-900">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="bg-amber-100 dark:bg-amber-500/20 p-2 rounded-xl">
+                      <BusIcon className="text-amber-600 dark:text-amber-400 flex-shrink-0" size={20} />
+                    </div>
+                    <h4 className="font-extrabold text-slate-900 dark:text-white text-lg tracking-tight">
                       {bus.busNumber}
                     </h4>
                   </div>
-                  
+
                   {/* Bus details */}
-                  <div className="ml-7 space-y-2">
+                  <div className="ml-11 space-y-3">
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase">Capacity</p>
-                        <p className="text-sm font-semibold text-gray-900">
+                      <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1">Max Cap</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">
                           {bus.capacity} seats
                         </p>
                       </div>
                       {bus.routeId && (
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 uppercase">Route</p>
-                          <p className="text-sm font-semibold text-gray-900">
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                          <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1">Assigned Route</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white">
                             {bus.routeId.routeName}
                           </p>
                         </div>
@@ -128,15 +113,15 @@ export default function ManageBuses() {
 
                     {/* Route stops if available */}
                     {bus.routeId && bus.routeId.stops && bus.routeId.stops.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase mb-2">Route Stops</p>
+                      <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-2">Linear Trajectory</p>
                         <div className="flex flex-wrap gap-2">
                           {bus.routeId.stops.map((stop, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs"
+                              className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700"
                             >
-                              <span className="font-semibold mr-1">#{stop.order}</span>
+                              <span className="font-black mr-1.5 text-amber-600 dark:text-amber-400">T{stop.order}</span>
                               {stop.name}
                             </span>
                           ))}
@@ -147,19 +132,16 @@ export default function ManageBuses() {
                 </div>
 
                 {/* Delete button */}
-                <Button
+                <button
                   onClick={() => handleDelete(bus._id)}
                   disabled={deletingId === bus._id}
-                  icon={Trash2}
-                  color="danger"
-                  variant="ghost"
-                  size="sm"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 self-start p-2.5 rounded-xl text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 transition-all font-bold text-sm disabled:opacity-50"
+                  title="Decommission Asset"
                 >
-                  {deletingId === bus._id ? "Deleting..." : "Delete"}
-                </Button>
+                  <Trash2 size={18} />
+                </button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, Search, Plus, Edit2, Trash2, Layers } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card from '../../components/ui/Card';
+import CreateCourse from '../../components/admin/CreateCourse';
+import CreateSection from '../../components/admin/CreateSection';
+import CreateSubject from '../../components/admin/CreateSubject';
 import api from '../../services/api';
 
 export default function AdminCourses() {
@@ -9,12 +12,14 @@ export default function AdminCourses() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
   useEffect(() => {
     api.get('/courses')
-      .then(res => setCourses(res.data || []))
+      .then(res => setCourses(res.data.courses || res.data || []))
       .catch(() => setCourses([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   const filtered = courses.filter(c =>
     c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -50,6 +55,24 @@ export default function AdminCourses() {
             />
           </div>
         </Card>
+
+        {/* Course Creation Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <Card shadow="sm" padding="lg">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Initialize Course Node</h3>
+            <CreateCourse onCreated={() => setRefreshKey(prev => prev + 1)} />
+          </Card>
+
+          <Card shadow="sm" padding="lg">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Allocate Course Section</h3>
+            <CreateSection refreshKey={refreshKey} onCreated={() => setRefreshKey(prev => prev + 1)} />
+          </Card>
+
+          <Card shadow="sm" padding="lg">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Define Curriculum Subject</h3>
+            <CreateSubject refreshKey={refreshKey} onCreated={() => setRefreshKey(prev => prev + 1)} />
+          </Card>
+        </div>
 
         {/* Courses */}
         {loading ? (

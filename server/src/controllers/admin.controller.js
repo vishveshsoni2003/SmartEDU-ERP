@@ -87,3 +87,38 @@ export const getInstitutionAdmins = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+/**
+ * TOGGLE ADMIN ACTIVE STATUS
+ * Prevents deactivated admins from performing any actions (protect middleware enforces this).
+ */
+export const toggleAdminStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent self-deactivation
+    if (id === req.user.userId) {
+      return res.status(400).json({ message: "You cannot deactivate your own account" });
+    }
+
+    const user = await User.findOne({
+      _id: id,
+      institutionId: req.user.institutionId,
+      role: { $in: ["ADMIN", "SUB_ADMIN"] }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    user.isActive = !user.isActive;
+    await user.save();
+
+    res.json({
+      message: `Admin ${user.isActive ? "activated" : "deactivated"} successfully`,
+      isActive: user.isActive
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

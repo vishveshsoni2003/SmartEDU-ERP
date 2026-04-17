@@ -8,48 +8,8 @@ import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 
-/* =======================
-   PEOPLE
-======================= */
-import CreateStudent from "../../components/admin/CreateStudent";
-import StudentList from "../../components/admin/StudentList";
-import CreateFaculty from "../../components/admin/CreateFaculty";
-import FacultyList from "../../components/admin/FacultyList";
-
-/* =======================
-   ACADEMIC SETUP
-======================= */
-import CreateCourse from "../../components/admin/CreateCourse";
-import CourseList from "../../components/admin/CourseList";
-import CreateSection from "../../components/admin/CreateSection";
-import SectionList from "../../components/admin/SectionList";
-import CreateSubject from "../../components/admin/CreateSubject";
-import SubjectList from "../../components/admin/SubjectList";
-
-/* =======================
-   TIMETABLE
-======================= */
-import CreateLecture from "../../components/admin/CreateLecture";
-import LectureList from "../../components/admin/LectureList";
-import AssignMentor from "../../components/admin/AssignMentor";
-
-/* =======================
-   OPERATIONS
-======================= */
-import CreateNotice from "../../components/admin/CreateNotice";
-import NoticeList from "../../components/admin/NoticeList";
-import CreateHostel from "../../components/admin/CreateHostel";
-import HostelList from "../../components/admin/HostelList";
-import CreateRoute from "../../components/admin/CreateRoute";
-import ManageRoutes from "../../components/admin/ManageRoutes";
-import CreateBus from "../../components/admin/CreateBus";
-import ManageBuses from "../../components/admin/ManageBuses";
-
-/* =======================
-   CALENDAR
-======================= */
-import CreateHoliday from "../../components/admin/CreateHoliday";
-import HolidayList from "../../components/admin/HolidayList";
+// Cleaned Dashboard Imports (Bug 2.1)
+// Creation components moved to specific module pages (e.g., AdminCourses)
 
 function SkeletonCard() {
   return (
@@ -96,14 +56,13 @@ export default function AdminDashboard() {
           className="flex flex-col lg:flex-row lg:items-end justify-between gap-6"
         >
           <div>
-            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">Root Gateway</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg font-medium">Coordinate internal modules, users, and routing environments.</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">Admin Overview</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg font-medium">Global bird's-eye view of your institution's core metrics.</p>
           </div>
 
-          {/* Quick Action Matrix */}
           <div className="flex items-center gap-3">
             <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-blue-500/20">
-              <Shield size={18} /> Run Diagnostics
+              <Shield size={18} /> System Audit
             </button>
           </div>
         </motion.div>
@@ -114,7 +73,7 @@ export default function AdminDashboard() {
         <section>
           <div className="flex items-center gap-3 mb-6">
             <div className="bg-indigo-500/10 p-2 rounded-lg"><Layers size={22} className="text-indigo-600 dark:text-indigo-400" /></div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Active Core States</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">System Telemetry</h2>
           </div>
 
           {!stats ? (
@@ -197,132 +156,6 @@ export default function AdminDashboard() {
             </Card>
           </div>
         </section>
-
-        {/* =======================
-              ACADEMIC SETUP
-          ======================= */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-blue-500/10 p-2 rounded-lg"><BookOpen size={22} className="text-blue-600 dark:text-blue-400" /></div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Academic Engineering</h2>
-          </div>
-
-          <div className="space-y-6">
-            {/* Courses */}
-            <Card shadow="md" padding="lg" className="overflow-hidden">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Master Courses</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CreateCourse onCreated={() => setCourseListKey(prev => prev + 1)} />
-                <CourseList key={courseListKey} />
-              </div>
-            </Card>
-
-            {/* Sections & Subjects */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card shadow="md" padding="lg">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Section Routing</h3>
-                <CreateSection onCreated={() => setSectionListKey(prev => prev + 1)} />
-                <div className="mt-8">
-                  <SectionList key={sectionListKey} />
-                </div>
-              </Card>
-              <Card shadow="md" padding="lg">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Subject Nodes</h3>
-                <CreateSubject onCreated={() => setSubjectListKey(prev => prev + 1)} />
-                <div className="mt-8">
-                  <SubjectList key={subjectListKey} />
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* =======================
-              PEOPLE MANAGEMENT
-          ======================= */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-emerald-500/10 p-2 rounded-lg"><Users size={22} className="text-emerald-600 dark:text-emerald-400" /></div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">User Matrix Management</h2>
-          </div>
-
-          <div className="space-y-6">
-            <Card shadow="md" padding="lg">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Student Directory Tracking</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CreateStudent onCreated={() => setStudentListKey(prev => prev + 1)} />
-                <StudentList key={studentListKey} />
-              </div>
-            </Card>
-
-            <Card shadow="md" padding="lg">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Faculty Permissions</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CreateFaculty onCreated={() => setFacultyListKey(prev => prev + 1)} />
-                <FacultyList key={facultyListKey} />
-              </div>
-            </Card>
-          </div>
-        </section>
-
-        {/* =======================
-              TIMETABLE & MENTOR
-          ======================= */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-purple-500/10 p-2 rounded-lg"><Clock size={22} className="text-purple-600 dark:text-purple-400" /></div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Schedule Subnets & Mentorships</h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card shadow="md" padding="lg">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Lecture Injection</h3>
-              <CreateLecture onCreated={() => setLectureListKey(prev => prev + 1)} />
-              <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-8">
-                <LectureList key={lectureListKey} />
-              </div>
-            </Card>
-
-            <Card shadow="md" padding="lg">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Mentor Aggregation</h3>
-              <AssignMentor />
-            </Card>
-          </div>
-        </section>
-
-        {/* =======================
-              OPERATIONS
-          ======================= */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-rose-500/10 p-2 rounded-lg"><Building2 size={22} className="text-rose-600 dark:text-rose-400" /></div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Facility Telemetry</h2>
-          </div>
-
-          <div className="space-y-6">
-            <Card shadow="md" padding="lg">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Hostel Deployments</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CreateHostel onCreated={() => setHostelListKey(prev => prev + 1)} />
-                <HostelList key={hostelListKey} />
-              </div>
-            </Card>
-
-            <Card shadow="md" padding="lg">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Route Vectors & Operations</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CreateRoute onCreated={() => { }} />
-                <div className="space-y-6 border-l border-slate-200 dark:border-slate-800 pl-8">
-                  <ManageRoutes />
-                  <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
-                    <ManageBuses />
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </section>
-
       </div>
     </DashboardLayout>
   );

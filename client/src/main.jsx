@@ -6,21 +6,18 @@ import "./index.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { Toaster } from "react-hot-toast";
-import { LoadScript } from "@react-google-maps/api";
+
+// NOTE: Google Maps (LoadScript) has been moved to the CreateRoute admin component
+// so it only loads on that specific page, not globally. This prevents the
+// "google is not defined" crash when VITE_GOOGLE_MAPS_KEY is unset.
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <LoadScript
-    googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY}
-    libraries={["places"]}
-  >
-
-    <React.StrictMode>
-      <ThemeProvider>
-        <AuthProvider>
-          <Toaster position="top-right" />
-          <App />
-        </AuthProvider>
-      </ThemeProvider>
-    </React.StrictMode>
-  </LoadScript>
+  <React.StrictMode>
+    <ThemeProvider>
+      <AuthProvider>
+        <Toaster position="top-right" />
+        <App />
+      </AuthProvider>
+    </ThemeProvider>
+  </React.StrictMode>
 );

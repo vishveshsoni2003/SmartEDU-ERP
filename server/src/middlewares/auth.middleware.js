@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-export const protect = (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
 
   if (
@@ -16,6 +17,13 @@ export const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if user is still active in database (fixes 1.3 - deactivated accounts)
+    const activeUser = await User.findById(decoded.userId).select('isActive');
+    if (activeUser && activeUser.isActive === false) {
+      return res.status(403).json({ message: "Account disabled. Access revoked." });
+    }
+
     req.user = decoded; // decoded: { userId, role, institutionId }
     req.user.id = decoded.userId; // normalize: req.user.id works everywhere
     next();

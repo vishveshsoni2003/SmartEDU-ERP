@@ -34,6 +34,7 @@ import facultyAttendanceRoutes from "./src/routes/facultyAttendance.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
 import applicationRoutes from "./src/routes/application.routes.js";
 import reportRoutes from "./src/routes/report.routes.js";
+import financeRoutes from "./src/routes/finance.routes.js";
 import { logAudit } from "./src/middlewares/audit.middleware.js";
 
 // ================= INIT =================
@@ -151,6 +152,7 @@ app.use("/api/faculty-attendance", facultyAttendanceRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/finance", financeRoutes);
 
 // ================= SOCKET.IO =================
 initSocket(server);

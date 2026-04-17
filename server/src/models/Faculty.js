@@ -20,7 +20,7 @@ const facultySchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    designation: {
+    facultyType: {
       type: [String],
       enum: ["LECTURER", "WARDEN", "CLUB_INCHARGE", "TRANSPORT_MANAGER"],
       default: ["LECTURER"]
@@ -35,6 +35,5 @@ const facultySchema = new mongoose.Schema(
 );
 
 facultySchema.index({ institutionId: 1, employeeId: 1 }, { unique: true });
-facultySchema.index({ institutionId: 1, departmentId: 1 });
 
 export default mongoose.model("Faculty", facultySchema);

@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
       required: true
     },
     status: { type: String, default: "ACTIVE" },
+    isActive: { type: Boolean, default: true },
     refreshToken: { type: String },
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Date }

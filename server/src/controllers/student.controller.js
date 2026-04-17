@@ -134,10 +134,18 @@ export const getAllStudents = asyncHandler(async (req, res) => {
   let filter = { institutionId: req.user.institutionId };
 
   if (search) {
-    // We can't nicely search User's name directly from Student collection unless we aggregate or use regex
-    // For simplicity with mongoose, we search enrollmentNo
+    // Search by enrollmentNo OR rollNo directly on Student,
+    // and also by User name via a pre-fetched userId list
+    const matchingUsers = await (await import("../models/User.js")).default.find(
+      { name: { $regex: search, $options: "i" }, institutionId: req.user.institutionId },
+      "_id"
+    );
+    const userIds = matchingUsers.map(u => u._id);
+
     filter.$or = [
-      { enrollmentNo: { $regex: search, $options: "i" } }
+      { enrollmentNo: { $regex: search, $options: "i" } },
+      { rollNo: { $regex: search, $options: "i" } },
+      { userId: { $in: userIds } }
     ];
   }
 

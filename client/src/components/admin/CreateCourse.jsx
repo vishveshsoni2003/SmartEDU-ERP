@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import api from "../../services/api";
 
 export default function CreateCourse({ onCreated }) {
@@ -8,7 +9,12 @@ export default function CreateCourse({ onCreated }) {
     totalSemesters: ""
   });
 
-  const submit = async () => {
+  const submit = async (e) => {
+    e?.preventDefault();
+    if (!form.name || !form.durationYears || !form.totalSemesters) {
+      return toast.error("Please fill all generic course fields");
+    }
+
     try {
       await api.post("/courses", {
         name: form.name,
@@ -16,21 +22,19 @@ export default function CreateCourse({ onCreated }) {
         totalSemesters: Number(form.totalSemesters)
       });
 
-      alert("Course created successfully");
+      toast.success("Academic master course created successfully!");
       setForm({ name: "", durationYears: "", totalSemesters: "" });
       if (onCreated) onCreated();
     } catch (err) {
-      alert(err.response?.data?.message || "Error creating course");
+      toast.error(err.response?.data?.message || "Failed to initialize course");
     }
   };
 
   return (
-    <div className="bg-white border rounded-xl p-6">
-      <h3 className="font-semibold mb-4">Create Course</h3>
-
+    <form className="space-y-4" onSubmit={submit}>
       <input
-        className="border p-2 w-full mb-2"
-        placeholder="Course Name"
+        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
+        placeholder="Course Name (e.g. Computer Science)"
         value={form.name}
         onChange={(e) =>
           setForm({ ...form, name: e.target.value })
@@ -39,7 +43,7 @@ export default function CreateCourse({ onCreated }) {
 
       <input
         type="number"
-        className="border p-2 w-full mb-2"
+        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
         placeholder="Duration (Years)"
         value={form.durationYears}
         onChange={(e) =>
@@ -49,7 +53,7 @@ export default function CreateCourse({ onCreated }) {
 
       <input
         type="number"
-        className="border p-2 w-full mb-4"
+        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-colors"
         placeholder="Total Semesters"
         value={form.totalSemesters}
         onChange={(e) =>
@@ -58,11 +62,11 @@ export default function CreateCourse({ onCreated }) {
       />
 
       <button
-        onClick={submit}
-        className="bg-black text-white px-4 py-2 rounded"
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-blue-600/20"
       >
-        Create Course
+        Deploy Course Architecture
       </button>
-    </div>
+    </form>
   );
 }

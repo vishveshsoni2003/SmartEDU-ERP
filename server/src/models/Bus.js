@@ -34,6 +34,13 @@ const busSchema = new mongoose.Schema(
       lng: Number,
       updatedAt: Date,
     },
+    tripStatus: {
+      type: String,
+      enum: ["IDLE", "ACTIVE", "PAUSED", "ENDED"],
+      default: "IDLE"
+    },
+    tripStartedAt: { type: Date, default: null },
+    tripEndedAt:   { type: Date, default: null },
   },
   { timestamps: true }
 );

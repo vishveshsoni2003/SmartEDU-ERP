@@ -31,8 +31,8 @@ export default function StudentDashboard() {
         setStudent(s);
 
         const [lectureRes, mentorRes] = await Promise.all([
-          api.get(`/attendance-percentage/lecture/${s._id}`),
-          api.get(`/attendance-percentage/mentor/${s._id}`)
+          api.get(`/attendance/lecture/percentage/${s._id}`),
+          api.get(`/attendance/mentor/percentage/${s._id}`)
         ]);
         setLectureAttendance(lectureRes.data);
         setMentorAttendance(mentorRes.data);
@@ -110,7 +110,7 @@ export default function StudentDashboard() {
           {student.studentType === "BUS_SERVICE" && (
             <Card shadow="md" padding="lg">
               <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Convoy Vector Status</h2>
-              <LiveBus busId={student.busId} />
+              <LiveBus busId={student.busId?._id || student.busId} />
             </Card>
           )}
         </div>
@@ -141,7 +141,7 @@ export default function StudentDashboard() {
         {student.studentType === "BUS_SERVICE" && (
           <div className="pt-6">
             <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Real-time Telemetry Overlay</h2>
-            <LiveBusMap busId={student.busId} />
+            <LiveBusMap busId={student.busId?._id || student.busId} />
           </div>
         )}
       </div>

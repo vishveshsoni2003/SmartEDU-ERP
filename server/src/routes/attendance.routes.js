@@ -1,4 +1,4 @@
-import { getLectureAttendancePercentage, getMentorAttendancePercentage } from "../controllers/attendance.controller.js";
+import { getLectureAttendancePercentage, getMentorAttendancePercentage, getLectureAttendanceHistory } from "../controllers/attendance.controller.js";
 import express from "express";
 import {
   markLectureAttendance,
@@ -34,6 +34,14 @@ router.get(
   protect,
   allowRoles("STUDENT", "ADMIN"),
   getMentorAttendancePercentage
+);
+
+// Faculty attendance history
+router.get(
+  "/lecture/history",
+  protect,
+  allowRoles("FACULTY", "ADMIN"),
+  getLectureAttendanceHistory
 );
 
 export default router;

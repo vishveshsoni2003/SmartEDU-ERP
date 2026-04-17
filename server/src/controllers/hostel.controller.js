@@ -155,8 +155,14 @@ export const deallocateRoom = asyncHandler(async (req, res) => {
  * GET HOSTELS (ADMIN / STUDENT)
  */
 export const getHostels = asyncHandler(async (req, res) => {
-  const hostels = await Hostel.find({
+  const dbHostels = await Hostel.find({
     institutionId: req.user.institutionId
+  }).lean();
+
+  const hostels = dbHostels.map(h => {
+    const totalRooms = h.rooms?.length || 0;
+    const occupiedRooms = h.rooms?.reduce((acc, r) => acc + (r.occupants?.length || 0), 0) || 0;
+    return { ...h, totalRooms, occupiedRooms };
   });
 
   res.json({ hostels });

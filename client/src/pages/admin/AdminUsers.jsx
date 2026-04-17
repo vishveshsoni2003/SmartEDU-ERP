@@ -13,6 +13,7 @@ const TAB_CLS = (active) =>
 
 export default function AdminUsers() {
   const [activeTab, setActiveTab] = useState("DIRECTORY");
+  const [editStudent, setEditStudent] = useState(null);
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -23,19 +24,30 @@ export default function AdminUsers() {
           <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">Manage student enrollments, bulk imports, and database integrity.</p>
         </div>
         <div className="flex flex-wrap gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl w-max border border-slate-200 dark:border-slate-800">
-          <button onClick={() => setActiveTab("DIRECTORY")} className={TAB_CLS(activeTab === "DIRECTORY")}>
+          <button onClick={() => { setActiveTab("DIRECTORY"); setEditStudent(null); }} className={TAB_CLS(activeTab === "DIRECTORY")}>
             <Database className="h-4 w-4" /> Directory
           </button>
           <button onClick={() => setActiveTab("CREATE")} className={TAB_CLS(activeTab === "CREATE")}>
             <UserPlus className="h-4 w-4" /> Enroll Student
           </button>
+          {editStudent && (
+            <button onClick={() => setActiveTab("EDIT")} className={TAB_CLS(activeTab === "EDIT")}>
+              <Edit className="h-4 w-4" /> Edit Student
+            </button>
+          )}
           <button onClick={() => setActiveTab("IMPORT")} className={TAB_CLS(activeTab === "IMPORT")}>
             <Upload className="h-4 w-4" /> Bulk Importer
           </button>
         </div>
         <div className="animate-in fade-in duration-200">
-          {activeTab === "DIRECTORY" && <StudentList />}
-          {activeTab === "CREATE" && <CreateStudent onCreated={() => setActiveTab("DIRECTORY")} />}
+          {activeTab === "DIRECTORY" && (
+            <StudentList onEdit={(s) => {
+              setEditStudent(s);
+              setActiveTab("EDIT");
+            }} />
+          )}
+          {activeTab === "CREATE" && <CreateStudent onCreated={() => { setActiveTab("DIRECTORY"); setEditStudent(null); }} />}
+          {activeTab === "EDIT" && <CreateStudent initialData={editStudent} onCreated={() => { setActiveTab("DIRECTORY"); setEditStudent(null); }} />}
           {activeTab === "IMPORT" && <BulkImport />}
         </div>
       </div>
